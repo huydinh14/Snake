@@ -4,8 +4,15 @@
 #include <conio.h>
 #include <time.h>
 #include <string.h>
+#include "resource.h"
+
+using namespace std;
+
+#pragma comment(lib, "winmm.lib")
+#define AUDIO(FileName) (PlaySound(MAKEINTRESOURCE(FileName),GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC));
 
 extern short SPages, SSelectLocation, STotalCatalog;
+
 
 enum class eStatus{
 	UP,
@@ -35,3 +42,8 @@ struct Fruit
 	Location location;
 };
 
+struct PLAYER
+{
+	char Name[20];
+	int iPoint;
+};

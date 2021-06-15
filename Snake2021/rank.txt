@@ -1,0 +1,6 @@
+Huy		1
+Hoa		2
+Kim		8
+Loc		16
+Huy		0
+
