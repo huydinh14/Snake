@@ -237,7 +237,6 @@ void RunEvent(Snake &snake, Fruit &fruit, int iTime, int iIndex, std::string str
 	PaintTable();
 	InitSnake(snake);
 	InitFruit(fruit, bCheck);
-	//OnDisplay(snake, fruit);
 	while (1)
 	{
 		OnDisplay(snake, fruit);
