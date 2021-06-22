@@ -1,10 +1,26 @@
-#include "Console.h"
+#include "Console.hpp"
 #include <string>
 #include <iostream>
 
 HANDLE hConsoleOutput;
 HANDLE hConsoleInput;
-void clrscr()
+
+void ConsoleResize(SHORT width, SHORT height)
+{
+	/*HWND console = GetConsoleWindow();
+	RECT r;
+	GetWindowRect(console, &r);
+	MoveWindow(console, r.left, r.top, width, height, TRUE);*/
+
+	COORD crd = { width, height };
+	SMALL_RECT rec = { 0, 0, width - 1, height - 1 };
+	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleWindowInfo(hConsoleOutput, TRUE, &rec);
+	SetConsoleScreenBufferSize(hConsoleOutput, crd);
+}
+
+
+void Clrscr()
 {
 
 	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
@@ -20,14 +36,14 @@ void clrscr()
 	SetConsoleCursorPosition(hConsoleOutput, screen_buffer_info.dwCursorPosition);
 }
 
-void gotoXY(short iRow, short iColumn)
+void GotoXY(short iRow, short iColumn)
 {
 	COORD Cursor_an_Pos = { iRow, iColumn };
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleCursorPosition(hConsoleOutput, Cursor_an_Pos);
 }
 
-int whereX()
+int WhereX()
 {
 	CONSOLE_SCREEN_BUFFER_INFO coninfo;
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -35,7 +51,7 @@ int whereX()
 	return coninfo.dwCursorPosition.X;
 }
 
-int whereY()
+int WhereY()
 {
 	CONSOLE_SCREEN_BUFFER_INFO coninfo;
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -50,7 +66,7 @@ void ShowCur(bool CursorVisibility)
 	SetConsoleCursorInfo(handle, &cursor);
 }
 
-void setColor(WORD color)
+void SetColor(WORD color)
 {
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -64,28 +80,28 @@ void setColor(WORD color)
 
 	SetConsoleTextAttribute(hConsoleOutput, wAttributes);
 }
-WORD textAttr()
+WORD TextAttr()
 {
 	CONSOLE_SCREEN_BUFFER_INFO ConsoleInfo;
 	GetConsoleScreenBufferInfo(hConsoleOutput, &ConsoleInfo);
 	return ConsoleInfo.wAttributes;
 }
 
-void resetTextAttr()
+void ResetTextAttr()
 {
-	DWORD Mau_Mac_Dinh = textAttr();
+	DWORD Mau_Mac_Dinh = TextAttr();
 	SetConsoleTextAttribute(hConsoleOutput, Mau_Mac_Dinh);
 }
-void setBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,std::string StrIcon, WORD colors...)
+void SetBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,std::string StrIcon, WORD colors, WORD bgcolor,...)
 {
-	gotoXY(x - 3, y);
-	setColor(colors);
-	setBackgroundColor(0);
+	GotoXY(x - 3, y);
+	SetColor(colors);
+	SetBackgroundColor(bgcolor);
 	std::cout << StrIcon;
 
-	gotoXY(x, y);
-	setBackgroundColor(background);
-	setColor(color);
+	GotoXY(x, y);
+	SetBackgroundColor(background);
+	SetColor(color);
 
 	/*In duoc nhieu chu hon*/
 	va_list args;
@@ -94,10 +110,26 @@ void setBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPS
 	va_end(args);
 	/*In duoc nhieu chu hon*/
 
-	resetTextAttr();
+	ResetTextAttr();
 	//setColor(7);
 }
-void setBackgroundColor(WORD color)
+void SetBackgroundColorTextXY2(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,...)
+{
+	GotoXY(x, y);
+	SetBackgroundColor(background);
+	SetColor(color);
+
+	/*In duoc nhieu chu hon*/
+	va_list args;
+	va_start(args, str);
+	vprintf(str, args);
+	va_end(args);
+	/*In duoc nhieu chu hon*/
+
+	ResetTextAttr();
+	//setColor(7);
+}
+void SetBackgroundColor(WORD color)
 {
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -112,7 +144,7 @@ void setBackgroundColor(WORD color)
 
 	SetConsoleTextAttribute(hConsoleOutput, wAttributes);
 }
-void deleteRow(SHORT SStartPos, SHORT SNumberRow)
+void DeleteRow(SHORT SStartPos, SHORT SNumberRow)
 {
 	CONSOLE_SCREEN_BUFFER_INFO  ConsoleInfo;
 	COORD Pos = { 0, SStartPos };

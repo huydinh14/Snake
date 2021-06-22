@@ -144,10 +144,10 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Console.h" />
-    <ClInclude Include="Function.h" />
+    <ClInclude Include="Console.hpp" />
+    <ClInclude Include="Function.hpp" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
