@@ -5,6 +5,8 @@
 #include <time.h>
 #include <string.h>
 #include "resource.hpp"
+#include <windows.h>
+#include <stdio.h>
 
 
 #pragma comment(lib, "winmm.lib")

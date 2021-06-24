@@ -146,7 +146,7 @@
   <ItemGroup>
     <ClInclude Include="Console.hpp" />
     <ClInclude Include="Function.hpp" />
-    <ClInclude Include="main.h" />
+    <ClInclude Include="main.hpp" />
     <ClInclude Include="resource.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
