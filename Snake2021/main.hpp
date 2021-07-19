@@ -14,7 +14,7 @@
 
 extern short sPages, sSelectLocation, sTotalCatalog;
 
-enum class eStatus{
+enum class eDirections {
 	UP,
 	DOWN,
 	LEFT,
@@ -34,7 +34,7 @@ struct Snake
 {
 	Location LN[100];
 	int iN;
-	eStatus est;
+	eDirections eDirecs;
 };
 
 struct Fruit

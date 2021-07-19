@@ -17,7 +17,7 @@ int main(){
 	}
 	catch (const std::exception&)
 	{
-
+		std::cout << "Error.\n";
 	}
 	return 0;
 }
