@@ -13,9 +13,14 @@
 #define Yellow			14
 #define White			15
 
-#define WIDTH 105
+#define WIDTH 106
 #define HEIGHT 30
 #define WALL 45
+
+int iUP = Yellow;
+int iDOWN = Yellow;
+int iLEFT = Yellow;
+int iRIGHT = Yellow;
 
 Snake snake;
 Fruit fruit;
@@ -41,14 +46,15 @@ short SYCoord;
 void InitFruit(Fruit& fruit, bool bCheck)
 {
 	srand(time(NULL));
-	while (bCheck == false) 
+	while (!bCheck) 
 	{
-		fruit.Location.sX = rand() % ((100 - 7 + 1) / 2) + 3.5;
-		fruit.Location.sY = rand() % ((31 - 7 + 1) / 2) + 3.5;
+		fruit.Location.sX = rand() % 50;
+		fruit.Location.sY = rand() % 15,5;
 		for (int i = 0; i < snake.iN - 1; i++) {
 			if (snake.LN[i].sX == fruit.Location.sX && snake.LN[i].sY == fruit.Location.sY)
 			{
-				continue;
+				fruit.Location.sX = 0;
+				fruit.Location.sY = 0;
 			}
 		}
 		if (fruit.Location.sX != 0 && fruit.Location.sY != 0)
@@ -80,11 +86,10 @@ void InforDisplay(std::string strLevel, int& iPoint)
 	SetBackgroundColorTextXY2(WIDTH + 4, 6, Green, 0, StrTitle);
 	SetColor(White);
 	std::cout << strLevel;
-	StrTitle = (char*)"DIEM:   ";
+	StrTitle = (char*)"DIEM  : ";
 	SetBackgroundColorTextXY2(WIDTH + 4, 7, Green, 0, StrTitle);
 	SetColor(White);
 	std::cout << iPoint;
-
 	GotoXY(WIDTH / 2 - 7, HEIGHT + 3);
 	SetColor(White);
 	std::cout << "Snake v1.0 by HuyDinhSE";
@@ -94,6 +99,7 @@ bool InforDisGameOver(bool bCheck)
 {
 	if (bCheck)
 	{
+		AUDIO(IDR_WAVE1);
 		bStatusGame = false;
 		PaintMenuGameOver(1);
 		return true;
@@ -113,10 +119,20 @@ short YCoord(short SY) // Toa do y ve bang.
 
 void PaintTable()
 {
-	SetBackgroundColorTextXY2(5, 5, Yellow, 0, (char*)"%c", 4);
-	SetBackgroundColorTextXY2(106, 5, Yellow, 0, (char*)"%c", 4);
-	SetBackgroundColorTextXY2(5, 31, Yellow, 0, (char*)"%c", 4);
-	SetBackgroundColorTextXY2(106, 31, Yellow, 0, (char*)"%c", 4);
+	//SetBackgroundColorTextXY2(5, 5, Yellow, 0, (char*)"%c", 4);
+	//SetBackgroundColorTextXY2(106, 5, Yellow, 0, (char*)"%c", 4);
+	//SetBackgroundColorTextXY2(5, 31, Yellow, 0, (char*)"%c", 4);
+	//SetBackgroundColorTextXY2(106, 31, Yellow, 0, (char*)"%c", 4);
+	for (int i = 5; i <= 106; i++)
+	{
+		SetBackgroundColorTextXY2(i, 5, Yellow, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(i, 31, Yellow, 0, (char*)"%c", 4);
+	}
+	for (int i = 5; i <= 30; i++)
+	{
+		SetBackgroundColorTextXY2(5, i, Yellow, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(106, i, Yellow, 0, (char*)"%c", 4);
+	}
 	//TableCoordSave();
 	for (int i = 0; i < 25; ++i)
 	{
@@ -158,8 +174,13 @@ void PaintBoder()
 void PaintFruit(Fruit fruit)
 {
 	srand(time(NULL));
-	char iRandom = rand() % (26) + 65;
-	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 8, (char*)"%c ", iRandom);
+	char iRandom = rand() % 6 + 1;
+	SetColor(13);
+	GotoXY(116,9);
+	std::cout << fruit.Location.sX;
+	GotoXY(116, 10);
+	std::cout << fruit.Location.sY;
+	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 0, (char*)"%c ", iRandom);
 }
 
 void PaintSnake(Snake snake)
@@ -169,16 +190,112 @@ void PaintSnake(Snake snake)
 	{
 		SetBackgroundColorTextXY2(XCoord(snake.LN[i].sX), YCoord(snake.LN[i].sY), 15, 15, (char*)"  "); // Ve than con ran
 	}
-	SetBackgroundColorTextXY2(XCoord(snake.LN[snake.iN - 1].sX), YCoord(snake.LN[snake.iN - 1].sY), 8, 8, (char*)"  "); // Xoa duoi con ran
+	SetBackgroundColorTextXY2(XCoord(snake.LN[snake.iN - 1].sX), YCoord(snake.LN[snake.iN - 1].sY), 8, 0, (char*)"  "); // Xoa duoi con ran
 }
 
 void PaintBox(short SX, short SY)
 {
-	SetBackgroundColorTextXY2(XCoord(SX), YCoord(SY), 0, 8, (char*)"  ");
+	SetBackgroundColorTextXY2(XCoord(SX), YCoord(SY), 0, 0, (char*)"  ");
+}
+
+void PaintMenuControlConsole_UP()
+{
+	SetBackgroundColorTextXY2(116, 13, iUP, 0, (char*)"%c", 30);
+	SetBackgroundColorTextXY2(115, 14, iUP, 0, (char*)"%c", 30);
+	SetBackgroundColorTextXY2(116, 14, iUP, 0, (char*)"%c", 30);
+	SetBackgroundColorTextXY2(117, 14, iUP, 0, (char*)"%c", 30);
+}
+
+void PaintMenuControlConsole_LEFT()
+{
+	SetBackgroundColorTextXY2(112, 15, iLEFT, 0, (char*)"%c", 17);
+	SetBackgroundColorTextXY2(111, 16, iLEFT, 0, (char*)"%c", 17);
+	SetBackgroundColorTextXY2(112, 16, iLEFT, 0, (char*)"%c", 17);
+	SetBackgroundColorTextXY2(112, 17, iLEFT, 0, (char*)"%c", 17);
+}
+
+void PaintMenuControlConsole_DOWN()
+{
+	SetBackgroundColorTextXY2(116, 19, iDOWN, 0, (char*)"%c", 31);
+	SetBackgroundColorTextXY2(115, 18, iDOWN, 0, (char*)"%c", 31);
+	SetBackgroundColorTextXY2(116, 18, iDOWN, 0, (char*)"%c", 31);
+	SetBackgroundColorTextXY2(117, 18, iDOWN, 0, (char*)"%c", 31);
+
+}
+
+void PaintMenuControlConsole_RIGHT()
+{
+	SetBackgroundColorTextXY2(120, 15, iRIGHT, 0, (char*)"%c", 16);
+	SetBackgroundColorTextXY2(120, 16, iRIGHT, 0, (char*)"%c", 16);
+	SetBackgroundColorTextXY2(121, 16, iRIGHT, 0, (char*)"%c", 16);
+	SetBackgroundColorTextXY2(120, 17, iRIGHT, 0, (char*)"%c", 16);
+}
+
+void PaintMenuControlConsole()
+{
+	PaintMenuControlConsole_UP();
+	PaintMenuControlConsole_DOWN();
+	PaintMenuControlConsole_LEFT();
+	PaintMenuControlConsole_RIGHT();
+}
+
+void UpdateKeyControlOnConsole(int iControl)
+{
+	switch (iControl)
+	{
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	case 4:
+		break;
+	}
+}
+
+void PaintPine()
+{
+	SetBackgroundColorTextXY2(115, 6, Yellow, Black, (char*)"HUY");
+	SetBackgroundColorTextXY2(112, 12, Yellow, Black, (char*)"D I");
+	SetBackgroundColorTextXY2(116, 12, Green, Black, (char*)"*");
+	SetBackgroundColorTextXY2(118, 12, Yellow, Black, (char*)"N H");
+	SetColor(Green);
+	int n = 5;
+	for ( int i = 1; i <= n; i++) 
+	{
+		GotoXY(112, 6 + i);
+		for (int j = 1; j <= n - i; j++)
+			printf(" ");
+
+		for (int j = 1; j <= i; j++)
+			printf("* ");
+
+		printf("\n");
+	}
+	for (int i = 2; i <= n; i++)
+	{
+		GotoXY(112,11 + i);
+		for (int j = 1; j <= n - i; j++)
+			printf(" ");
+
+		for (int j = 1; j <= i; j++)
+			printf("* ");
+
+		printf("\n");
+	}
+
+	SetBackgroundColorTextXY2(112, 17, Yellow, Black, (char*)"2 0");
+	SetBackgroundColorTextXY2(116, 17, Yellow, Green, (char*)" ");
+	SetBackgroundColorTextXY2(118, 17, Yellow, Black, (char*)"2 1");
+	SetBackgroundColorTextXY2(116, 18, Yellow, Green, (char*)"S");
+	SetBackgroundColorTextXY2(116, 19, Yellow, Green, (char*)"E");
+	SetBackgroundColorTextXY2(116, 20, Yellow, Green, (char*)" ");
 }
 
 void PaintMenuMain(short sIndex)
 { 
+	 PaintPine();
 	 PaintBoder();
 	 sSelectLocation = sIndex;
 	 sTotalCatalog = 4;
@@ -195,6 +312,7 @@ void PaintMenuMain(short sIndex)
 	SetBackgroundColorTextXY(SW,SH + 2, White, ((sIndex == 3) ? Red : 0), strTitle, strIcon, ((sIndex == 3) ? Pink : 0),0);
 	strTitle = (char*)"  THOAT   ";
 	SetBackgroundColorTextXY(SW,SH + 3, White, ((sIndex == 4) ? Red : 0), strTitle, strIcon, ((sIndex == 4) ? Pink : 0),0);
+	AUDIO(IDR_WAVE3);
 }
 
 void PaintLevelMenu(short sIndex)
@@ -216,6 +334,7 @@ void PaintLevelMenu(short sIndex)
 	SetBackgroundColorTextXY(SW, SH + 2, White, ((sIndex == 2) ? Red : 0), strTitle, strIcon, ((sIndex == 2) ? Pink : 0),0);
 	strTitle = (char*)"  THOAT  ";
 	SetBackgroundColorTextXY(SW - 1, SH + 3, White, ((sIndex == 3) ? Red : 0), strTitle, strIcon, ((sIndex == 3) ? Pink : 0),0);
+	AUDIO(IDR_WAVE3);
 }
 
 void PaintMenuPause(short sIndex)
@@ -224,13 +343,14 @@ void PaintMenuPause(short sIndex)
 	sTotalCatalog = 3;
 
 	LPSTR strTitle = (char*)"  TAM DUNG  ";
-	SetBackgroundColorTextXY2(WIDTH / 2 - 4, HEIGHT / 2, White, Green, strTitle);
+	SetBackgroundColorTextXY2(WIDTH + 5, HEIGHT / 2 + 7, White, Green, strTitle);
 	strTitle = (char*)"  TIEP TUC  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 4, HEIGHT / 2 + 2, White, ((sIndex == 0) ? Red : 8), strTitle, strIcon, ((sIndex == 0) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, White, ((sIndex == 0) ? Red : 0), strTitle, strIcon, ((sIndex == 0) ? Pink : 0), 0);
 	strTitle = (char*)"  LUU  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 2, HEIGHT / 2 + 3, White, ((sIndex == 1) ? Red : 8), strTitle, strIcon, ((sIndex == 1) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 7, HEIGHT / 2 + 10, White, ((sIndex == 1) ? Red : 0), strTitle, strIcon, ((sIndex == 1) ? Pink : 0), 0);
 	strTitle = (char*)"  THOAT  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 3, HEIGHT / 2 + 4, White, ((sIndex == 2) ? Red : 8), strTitle, strIcon, ((sIndex == 2) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, White, ((sIndex == 2) ? Red : 0), strTitle, strIcon, ((sIndex == 2) ? Pink : 0), 0);
+	AUDIO(IDR_WAVE3);
 }
 
 void PaintMenuGameOver(int iIndex) 
@@ -238,14 +358,14 @@ void PaintMenuGameOver(int iIndex)
 	sSelectLocation = iIndex;
 	sTotalCatalog = 3;
 
-	LPSTR strTitle = (char*)"  THUA  ";
-	SetBackgroundColorTextXY2(WIDTH / 2 - 2, HEIGHT / 2, White, Green, strTitle);
+	LPSTR strTitle = (char*)"     THUA     ";
+	SetBackgroundColorTextXY2(WIDTH + 4, HEIGHT / 2 + 7, White, Green, strTitle);
 	strTitle = (char*)"  CHOI LAI  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 4, HEIGHT / 2 + 2, White, ((iIndex == 0) ? Red : 8), strTitle, strIcon, ((iIndex == 0) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, White, ((iIndex == 0) ? Red : 0), strTitle, strIcon, ((iIndex == 0) ? Pink : 0), 0);
 	strTitle = (char*)"  LUU  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 2, HEIGHT / 2 + 3, White, ((iIndex == 1) ? Red : 8), strTitle, strIcon, ((iIndex == 1) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 7, HEIGHT / 2 + 10, White, ((iIndex == 1) ? Red : 0), strTitle, strIcon, ((iIndex == 1) ? Pink : 0), 0);
 	strTitle = (char*)"  THOAT  ";
-	SetBackgroundColorTextXY(WIDTH / 2 - 3, HEIGHT / 2 + 4, White, ((iIndex == 2) ? Red : 8), strTitle, strIcon, ((iIndex == 2) ? Pink : 8), 8);
+	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, White, ((iIndex == 2) ? Red : 0), strTitle, strIcon, ((iIndex == 2) ? Pink : 0), 0);
 }
 
 //void TableCoordSave()
@@ -364,10 +484,6 @@ void Directional(Snake& snake)
 
 void Control(Snake& snake)
 {
-	/*for (int i = snake.iN - 1; i > 0; i--)
-	{
-		snake.LN[i] = snake.LN[i - 1];
-	}*/
 		PaintSnake(snake);
 		for (int i = snake.iN - 1; i > 0; i--)
 		{
@@ -392,64 +508,6 @@ void Control(Snake& snake)
 //	if (GetAsyncKeyState(VK_RIGHT))
 //	{
 //		return 4;
-//	}
-//}
-
-//void KeyboardProcessingControl(KEY_EVENT_RECORD Key)
-//{
-//	if (Key.bKeyDown)
-//	{
-//		//while (1)
-//		{
-//			ControlSnake(snake);
-//			switch (Key.wVirtualKeyCode)
-//			{
-//			case VK_UP:
-//				if (snake.est != eStatus::DOWN)
-//				{
-//					snake.est = eStatus::UP;
-//				}
-//				break;
-//			case VK_DOWN:
-//				if (snake.est != eStatus::UP)
-//				{
-//					snake.est = eStatus::DOWN;
-//				}
-//				break;
-//			case VK_LEFT:
-//				if (snake.est != eStatus::RIGHT)
-//				{
-//					snake.est = eStatus::LEFT;
-//				}
-//				break;
-//			case VK_RIGHT:
-//				if (snake.est != eStatus::LEFT)
-//				{
-//					snake.est = eStatus::RIGHT;
-//				}
-//				break;
-//			}
-//
-//			if (snake.est == eStatus::UP)
-//			{
-//				snake.LN[0].sY--;
-//			}
-//			if (snake.est == eStatus::DOWN)
-//			{
-//				snake.LN[0].sY++;
-//			}
-//			if (snake.est == eStatus::LEFT)
-//			{
-//				snake.LN[0].sX--;
-//			}
-//			if (snake.est == eStatus::RIGHT)
-//			{
-//				snake.LN[0].sX++;
-//			}
-//			//ControlSnake(snake);
-//			PaintSnake(snake, fruit);
-//			Sleep(200);
-//		}
 //	}
 //}
 
@@ -528,6 +586,7 @@ void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int&
 	PaintSnake(snake);
 	PaintFruit(fruit);
 	bStatusGame = true;
+	AUDIO(IDR_WAVE5);
 	/*while (1)
 	{
 		PaintSnake(snake);
@@ -569,7 +628,9 @@ void EventProcessing()
 			{
 				Control(snake);
 				Directional(snake);
+				PaintMenuControlConsole();
 				CheckSnake(snake, fruit, iPoint);
+				iUP = iDOWN = iLEFT = iRIGHT = Yellow;
 			}
 			DWORD DWNumberOfEvents = 0; // Luu lai su kien hien tai.
 			DWORD DWNumberOfEventsRead = 0; // Luu lai so luong su kien da duoc loc.
@@ -605,15 +666,16 @@ void EventProcessing()
 	}
 }
 
-void SnakeEatFruit(Snake& snake, Fruit& frui, int& iPoint,bool bCheck)
+void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iPoint,bool bCheck)
 {
 	if ((snake.LN[0].sX == fruit.Location.sX) && (snake.LN[0].sY == fruit.Location.sY)) {
 		snake.iN++;
+		AUDIO(IDR_WAVE2);
 		InitFruit(fruit, bCheck);
 		PaintFruit(fruit);
 		iPoint++;
 		UpdatePoint(iPoint);
-		iTime -= 3;
+		iTime -= 2;
 	}
 }
 
@@ -660,6 +722,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			case 3: // Control Snake Up
 				if (bStatusGame == true)
 				{
+					iUP = Red;
 					if (snake.eDirecs == eDirections::DOWN)
 					{
 
@@ -669,6 +732,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 						snake.eDirecs = eDirections::UP;
 					}
 					
+													
 					//SetBackgroundColor(2);
 					//std::cout << iDirect;  Check thu nhung khong chay vao
 					//while (1)
@@ -698,6 +762,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 							sSelectLocation -= 1;
 						}
 						PaintMenuGameOver(sSelectLocation);
+						AUDIO(IDR_WAVE3);
 					}
 				}
 				break;
@@ -758,6 +823,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			case 3: // Control Snake DOWN
 				if (bStatusGame == true)
 				{
+					iDOWN = Red;
 					if (snake.eDirecs == eDirections::UP)
 					{
 
@@ -766,6 +832,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					{
 						snake.eDirecs = eDirections::DOWN;
 					}
+					
 					//Control(snake, 2);
 					/*if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(VK_RIGHT))
 					{
@@ -787,6 +854,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 							sSelectLocation += 1;
 						}
 						PaintMenuGameOver(sSelectLocation);
+						AUDIO(IDR_WAVE3);
 					}
 				}
 				break;
@@ -814,12 +882,14 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			{
 				if (snake.eDirecs == eDirections::RIGHT)
 				{
-
+					iLEFT = Red;
 				}
 				else
 				{
 					snake.eDirecs = eDirections::LEFT;
+					iLEFT = Red;
 				}
+				
 				//while (1)
 				//{
 				//PaintSnake(snake);
@@ -838,12 +908,14 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			{
 				if (snake.eDirecs == eDirections::LEFT)
 				{
-
+					iRIGHT = Red;
 				}
 				else
 				{
 					snake.eDirecs = eDirections::RIGHT;
+					iRIGHT = Red;
 				}
+
 				/*while (1)
 				{
 					PaintSnake(snake);
@@ -868,7 +940,6 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					sPages = 3;
 					DeleteRow(7, HEIGHT + 1);
 					RunEvent(snake, fruit, sSelectLocation, strLevel, iPoint);
-					//AUDIO(104);
 				}
 				else if (sSelectLocation == 2)
 				{
@@ -897,7 +968,6 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					strLevel = "DE";
 					sPages = 3;
 					DeleteRow(5, HEIGHT);
-
 					RunEvent(snake, fruit, sSelectLocation, strLevel, iPoint);
 				}
 				else if (sSelectLocation == 1)
@@ -941,7 +1011,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				else if (sSelectLocation == 2)
 				{
 					sPages = 1;
-					DeleteRow(6, HEIGHT);
+					DeleteRow(5, HEIGHT);
 					PaintMenuMain(1);
 				}
 				break;
@@ -956,7 +1026,6 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 						PaintTable();
 						PaintSnake(snake);
 						PaintFruit(fruit);
-						/*RunEvent(snake, fruit, sSelectLocation, strLevel, iPoint);*/
 					}
 					else if (sSelectLocation == 1)
 					{
@@ -965,7 +1034,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					else if (sSelectLocation == 2)
 					{
 						sPages = 1;
-						DeleteRow(6, HEIGHT);
+						DeleteRow(5, HEIGHT);
 						PaintMenuMain(1);
 					}
 				}
@@ -981,7 +1050,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				break;
 			case 2:
 				sPages = 1;
-				DeleteRow(6, HEIGHT);
+				DeleteRow(5, HEIGHT);
 				PaintMenuMain(1);
 				break;
 			case 3:
@@ -991,7 +1060,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				break;
 			case 4:
 				sPages = 1;
-				DeleteRow(6, HEIGHT);
+				DeleteRow(5, HEIGHT);
 				PaintMenuMain(1);
 				break;
 			}

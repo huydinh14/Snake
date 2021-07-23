@@ -13,6 +13,7 @@ short YCoord(short SY);
 void TitleMenuMain();
 void InforDisplay(std::string strLevel, int& iPoint);
 bool InforDisGameOver(bool bCheck);
+void PaintMenuControlConsole();
 void PaintBoder();
 void PaintSnake(Snake snake);	
 void PaintFruit(Fruit fruit);
@@ -27,6 +28,7 @@ void PaintMenuGameOver(int iIndex);
 //void ControlSnake(Snake& snake);			                  
 void Control(Snake& snake);
 void Directional(Snake& snake);
+void UpdateKeyControlOnConsole(int iControl);
 
 // Even processing
 void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int& iPoint);

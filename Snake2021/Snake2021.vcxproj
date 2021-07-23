@@ -149,6 +149,19 @@
     <ClInclude Include="main.hpp" />
     <ClInclude Include="resource.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="snake.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="game_over.wav" />
+    <None Include="eat_fruit.wav" />
+    <None Include="operation_menu.wav" />
+    <None Include="intro.wav" />
+    <None Include="playgame.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\icon1.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

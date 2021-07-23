@@ -8,10 +8,11 @@ short sPages, sSelectLocation, sTotalCatalog;
 int main(){
 	try
 	{
-		ConsoleResize(123,35);
+		ConsoleResize(123,40);
 		SetConsoleTitle(TEXT("Snake Game - Huy Dinh SE"));
 		ShowCur(false);
 		PaintMenuMain(1);
+		AUDIO(IDR_WAVE4);
 		sPages = 1;
 		EventProcessing();
 	}
