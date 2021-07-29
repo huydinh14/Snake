@@ -139,13 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Console.cpp" />
-    <ClCompile Include="Function.cpp" />
+    <ClCompile Include="console.cpp" />
+    <ClCompile Include="function.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Console.hpp" />
-    <ClInclude Include="Function.hpp" />
+    <ClInclude Include="console.hpp" />
+    <ClInclude Include="function.hpp" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="resource.hpp" />
   </ItemGroup>

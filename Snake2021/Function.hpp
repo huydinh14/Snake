@@ -11,41 +11,43 @@ short YCoord(short SY);
 
 // Paint
 void TitleMenuMain();
-void InforDisplay(std::string strLevel, int& iPoint);
+void InforDisplay(std::string strLevel, int& iScore);
 bool InforDisGameOver(bool bCheck);
 void PaintMenuControlConsole();
 void PaintBoder();
-void PaintSnake(Snake snake);	
-void PaintFruit(Fruit fruit);
+void PaintPine();
 void PaintTable();
 void PaintBox(short SX, short SY);
+void PaintSnake(Snake snake);	
+void PaintFruit(Fruit fruit);
 void PaintMenuMain(short sIndex);
 void PaintLevelMenu(short sIndex);
 void PaintMenuPause(short sIndex);
 void PaintMenuGameOver(int iIndex);
 
-// Control
-//void ControlSnake(Snake& snake);			                  
+// Control		                  
 void Control(Snake& snake);
 void Directional(Snake& snake);
-void UpdateKeyControlOnConsole(int iControl);
 
 // Even processing
-void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int& iPoint);
-void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iPoint,bool bCheck);
-void UpdatePoint(int iPoint);
+void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int& iScore);
+void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iScore,bool bCheck);
+void UpdatePoint(int iScore);
 bool BCheckGameOver(Snake& snake, Fruit& fruit);
 void EventProcessing();
 
 // Keyboard
 void KeyboardProcessing(KEY_EVENT_RECORD kKey);
 
-// Svae File
-void SaveName(int iPoint);
-void Point();
+// Save File
+void SaveName(int iScore);
+void TopScore();
 void ReadFile();
+bool BCheckFileEmpty();
+void WriteFileUpdate(int iLength);
+int SizeOfFile(FILE* _File);
+void ContinueGameWriteFile();
+void ContinueGameReadFile(Snake snake, Fruit fruit);
 
-//void ControlHeadSnake(Snake& snake);
-//int VKControl();
-//void TableCoordSave();
+
 

@@ -7,6 +7,7 @@
 #include "resource.hpp"
 #include <windows.h>
 #include <stdio.h>
+#include <vector>
 
 
 #pragma comment(lib, "winmm.lib")
@@ -33,7 +34,7 @@ struct Location {
 struct Snake
 {
 	Location LN[100];
-	int iN;
+	int iLength;
 	eDirections eDirecs;
 };
 
@@ -44,6 +45,6 @@ struct Fruit
 
 struct PLAYER
 {
-	char cName[20];
-	int iPoint;
+	char strName[10];
+	int iScore;
 };
