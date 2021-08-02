@@ -4,17 +4,14 @@
 #include <Windows.h>
 #include <string>
 
-#define consoleWidth 120
-#define consoleHeight 110
-
 // Ham thay doi kich co man hinh console.
-void ConsoleResize(SHORT width, SHORT height);
+void ConsoleResize(short sWidth, short sHeight);
 
 // Ham xoa man hinh khong bi dut(lag).
 void Clrscr();
 
 // Ham dich chuyen con tro den toa do x, y.
-void GotoXY(short iRow, short iColumn);
+void GotoXY(short sRow, short sColumn);
 
 // Tra ve vi tri x hien tai.
 int  WhereX();
@@ -23,7 +20,7 @@ int  WhereX();
 int  WhereY();
 
 // Ham an hien con tro.
-void ShowCur(bool CursorVisibility);
+void ShowCur(bool bCursorVisibility);
 
 // Ham to mau.
 void SetColor(WORD color);
@@ -31,13 +28,13 @@ void SetColor(WORD color);
 void ResetTextAttr();
 
 // Ham in mau chu va thay doi mai nen hien thi theo vi tri x, y, co ki tu dac biet.
-void SetBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPSTR str, std::string StrIcon, WORD colors, WORD bgcolor, ...);
+void SetBackgroundColorTextXY(SHORT sX, SHORT sY, WORD color, WORD background, LPSTR str, std::string strIcon, WORD colors, WORD bgColor, ...);
 
 // Ham in mau chu va thay doi mai nen hien thi theo vi tri x, y.
-void SetBackgroundColorTextXY2(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,...);
+void SetBackgroundColorTextXY2(SHORT sX, SHORT sY, WORD color, WORD background, LPSTR str,...);
 
 // Ham to mau nen
 void SetBackgroundColor(WORD color);
 
 // Xoa so luong dong, SStartPos - Vi tri bat dau xoa, SNumberRow so luong dong can xoa.
-void DeleteRow(SHORT SStartPos, SHORT SNumberRow);
+void DeleteRow(SHORT sStartPos, SHORT sNumberRow);

@@ -1,68 +1,67 @@
-#include "console.hpp"
 #include <string>
 #include <iostream>
+
+#include "console.hpp"
 
 HANDLE hConsoleOutput;
 HANDLE hConsoleInput;
 
-void ConsoleResize(SHORT width, SHORT height)
+void ConsoleResize(short sWidth, short sHeight)
 {
 	/*HWND console = GetConsoleWindow();
 	RECT r;
 	GetWindowRect(console, &r);
 	MoveWindow(console, r.left, r.top, width, height, TRUE);*/
 
-	COORD crd = { width, height };
-	SMALL_RECT rec = { 0, 0, width - 1, height - 1 };
+	COORD crd = { sWidth, sHeight };
+	SMALL_RECT rec = { 0, 0, sWidth - 1, sHeight - 1 };
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleWindowInfo(hConsoleOutput, TRUE, &rec);
 	SetConsoleScreenBufferSize(hConsoleOutput, crd);
 }
 
-
 void Clrscr()
 {
-
-	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
-	COORD Home = { 0, 0 };
+	CONSOLE_SCREEN_BUFFER_INFO screen_Buffer_Info;
+	COORD home = { 0, 0 };
 	DWORD dummy;
 
 	hConsoleOutput = GetStdHandle(STD_INPUT_HANDLE);
-	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_buffer_info);
+	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_Buffer_Info);
 
-	FillConsoleOutputCharacter(hConsoleOutput, ' ', screen_buffer_info.dwSize.X * screen_buffer_info.dwSize.Y, Home, &dummy);
-	screen_buffer_info.dwCursorPosition.X = 0;
-	screen_buffer_info.dwCursorPosition.Y = 0;
-	SetConsoleCursorPosition(hConsoleOutput, screen_buffer_info.dwCursorPosition);
+	FillConsoleOutputCharacter(hConsoleOutput, ' ', screen_Buffer_Info.dwSize.X * screen_Buffer_Info.dwSize.Y, home, &dummy);
+	screen_Buffer_Info.dwCursorPosition.X = 0;
+	screen_Buffer_Info.dwCursorPosition.Y = 0;
+	SetConsoleCursorPosition(hConsoleOutput, screen_Buffer_Info.dwCursorPosition);
 }
 
-void GotoXY(short iRow, short iColumn)
+void GotoXY(short sRow, short sColumn)
 {
-	COORD Cursor_an_Pos = { iRow, iColumn };
+	COORD cursor_An_Pos = { sRow, sColumn };
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(hConsoleOutput, Cursor_an_Pos);
+	SetConsoleCursorPosition(hConsoleOutput, cursor_An_Pos);
 }
 
 int WhereX()
 {
-	CONSOLE_SCREEN_BUFFER_INFO coninfo;
+	CONSOLE_SCREEN_BUFFER_INFO conInfo;
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(hConsoleOutput, &coninfo);
-	return coninfo.dwCursorPosition.X;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &conInfo);
+	return conInfo.dwCursorPosition.X;
 }
 
 int WhereY()
 {
-	CONSOLE_SCREEN_BUFFER_INFO coninfo;
+	CONSOLE_SCREEN_BUFFER_INFO conInfo;
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-	GetConsoleScreenBufferInfo(hConsoleOutput, &coninfo);
-	return coninfo.dwCursorPosition.Y;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &conInfo);
+	return conInfo.dwCursorPosition.Y;
 }
 
-void ShowCur(bool CursorVisibility)
+void ShowCur(bool bCursorVisibility)
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO cursor = { 1, CursorVisibility };
+	CONSOLE_CURSOR_INFO cursor = { 1, bCursorVisibility };
 	SetConsoleCursorInfo(handle, &cursor);
 }
 
@@ -70,36 +69,38 @@ void SetColor(WORD color)
 {
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
-	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_buffer_info);
+	CONSOLE_SCREEN_BUFFER_INFO screen_Buffer_Info;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_Buffer_Info);
 
-	WORD wAttributes = screen_buffer_info.wAttributes;
+	WORD wAttributes = screen_Buffer_Info.wAttributes;
 	color &= 0x000f;
 	wAttributes &= 0xfff0;
 	wAttributes |= color;
 
 	SetConsoleTextAttribute(hConsoleOutput, wAttributes);
 }
+
 WORD TextAttr()
 {
-	CONSOLE_SCREEN_BUFFER_INFO ConsoleInfo;
-	GetConsoleScreenBufferInfo(hConsoleOutput, &ConsoleInfo);
-	return ConsoleInfo.wAttributes;
+	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &consoleInfo);
+	return consoleInfo.wAttributes;
 }
 
 void ResetTextAttr()
 {
-	DWORD Mau_Mac_Dinh = TextAttr();
-	SetConsoleTextAttribute(hConsoleOutput, Mau_Mac_Dinh);
+	DWORD mau_Mac_Dinh = TextAttr();
+	SetConsoleTextAttribute(hConsoleOutput, mau_Mac_Dinh);
 }
-void SetBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,std::string StrIcon, WORD colors, WORD bgcolor,...)
+
+void SetBackgroundColorTextXY(SHORT sX, SHORT sY, WORD color, WORD background, LPSTR str,std::string strIcon, WORD colors, WORD bgColor,...)
 {
-	GotoXY(x - 3, y);
+	GotoXY(sX - 3, sY);
 	SetColor(colors);
-	SetBackgroundColor(bgcolor);
-	std::cout << StrIcon;
+	SetBackgroundColor(bgColor);
+	std::cout << strIcon;
 
-	GotoXY(x, y);
+	GotoXY(sX, sY);
 	SetBackgroundColor(background);
 	SetColor(color);
 
@@ -113,9 +114,10 @@ void SetBackgroundColorTextXY(SHORT x, SHORT y, WORD color, WORD background, LPS
 	ResetTextAttr();
 	//setColor(7);
 }
-void SetBackgroundColorTextXY2(SHORT x, SHORT y, WORD color, WORD background, LPSTR str,...)
+
+void SetBackgroundColorTextXY2(SHORT sX, SHORT sY, WORD color, WORD background, LPSTR str,...)
 {
-	GotoXY(x, y);
+	GotoXY(sX, sY);
 	SetBackgroundColor(background);
 	SetColor(color);
 
@@ -129,14 +131,15 @@ void SetBackgroundColorTextXY2(SHORT x, SHORT y, WORD color, WORD background, LP
 	ResetTextAttr();
 	//setColor(7);
 }
+
 void SetBackgroundColor(WORD color)
 {
 	hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	CONSOLE_SCREEN_BUFFER_INFO screen_buffer_info;
-	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_buffer_info);
+	CONSOLE_SCREEN_BUFFER_INFO screen_Buffer_Info;
+	GetConsoleScreenBufferInfo(hConsoleOutput, &screen_Buffer_Info);
 
-	WORD wAttributes = screen_buffer_info.wAttributes;
+	WORD wAttributes = screen_Buffer_Info.wAttributes;
 	color &= 0x000f;
 	color <<= 4; // Dich trai 3 bit de phu hop voi mau nen
 	wAttributes &= 0xff0f; // Cai 0 cho 1 bit chu nhay va 3 bit mau nen
@@ -144,13 +147,14 @@ void SetBackgroundColor(WORD color)
 
 	SetConsoleTextAttribute(hConsoleOutput, wAttributes);
 }
-void DeleteRow(SHORT SStartPos, SHORT SNumberRow)
+
+void DeleteRow(SHORT sStartPos, SHORT sNumberRow)
 {
 	CONSOLE_SCREEN_BUFFER_INFO  ConsoleInfo;
-	COORD Pos = { 0, SStartPos };
-	DWORD Tmp;
+	COORD pos = { 0, sStartPos };
+	DWORD tmp;
 	GetConsoleScreenBufferInfo(hConsoleOutput, &ConsoleInfo);
-	FillConsoleOutputCharacter(hConsoleOutput, ' ', ConsoleInfo.dwSize.X * SNumberRow, Pos, &Tmp);
-	FillConsoleOutputAttribute(hConsoleOutput, 15, ConsoleInfo.dwSize.X * SNumberRow, Pos, &Tmp);
-	SetConsoleCursorPosition(hConsoleOutput, Pos);
+	FillConsoleOutputCharacter(hConsoleOutput, ' ', ConsoleInfo.dwSize.X * sNumberRow,pos, &tmp);
+	FillConsoleOutputAttribute(hConsoleOutput, 15, ConsoleInfo.dwSize.X * sNumberRow, pos, &tmp);
+	SetConsoleCursorPosition(hConsoleOutput, pos);
 }

@@ -1,31 +1,18 @@
-﻿#include "function.hpp"
-#include "console.hpp"
+﻿#include "console.hpp"
+#include "define.hpp"
+#include "function.hpp"
 #include "main.hpp"
 
-#define Green			2
-#define Black			0
-#define Grey			8
-#define Blue			9
-#define LightGreen		10
-#define Cyan			11
-#define Red				12
-#define Pink			13
-#define Yellow			14
-#define White			15
-
-#define WIDTH			106
-#define HEIGHT			30
-#define WALL			45
-#define MAXPLAYER		50
-
-int iUP = Yellow;
-int iDOWN = Yellow;
-int iLEFT = Yellow;
-int iRIGHT = Yellow;
+int iUP = YELLOW;
+int iDOWN = YELLOW;
+int iLEFT = YELLOW;
+int iRIGHT = YELLOW;
 
 Snake snake;
 Fruit fruit;
-std::vector<PLAYER> Player;
+std::vector<Player> player;
+int* iArrLocX;
+int* iArrLocY;
 
 std::string strIcon = ">>";
 std::string strLevel = "DE";
@@ -36,30 +23,28 @@ bool bContinueGame = false;
 int iScore = 0;
 
 // Luu choi lai
+// iContinueDirectionSnake (1 - 2 - 3 - 4) ~ (UP - DOWN - LEFT - RIGHT)
 int iContinueLengthSnake = 3;
-int iContinueLocationSnake_iX = 0;
-int iContinueLocationSnake_iY = 0;
-int iContinueLocationFruit_iX = 0;
-int iContinueLocationFruit_iY = 0;
+int iContinueLocationSnakeX = 0;
+int iContinueLocationSnakeY = 0;
+int iContinueDirectionSnake = 4;
+int iContinueLocationFruitX = 0;
+int iContinueLocationFruitY = 0;
 int iContinueGameScore = 0;
-std::string iContinueGameLevel = "DE";
+int iContinueGameSpeed = 120;
+std::string strContinueGameLevel = "DE";
 
-// toc do ran
-int   iTime = 150;
+// Toc do ran
+int iTime = 150;
 
-// Toa do x, y ve bang.
-short SXCoord;
-short SYCoord;
-
-// 
 void InitFruit(Fruit& fruit, bool bCheck)
 {
 	srand(time(NULL));
 	while (!bCheck)
 	{
 		fruit.Location.sX = rand() % 50;
-		fruit.Location.sY = rand() % 15,5;
-		for (int i = 0; i < snake.iLength - 1; i++) 
+		fruit.Location.sY = rand() % 25;
+		for (int i = 0; i < snake.iLength - 1; i++)
 		{
 			if ((snake.LN[i].sX == fruit.Location.sX) && (snake.LN[i].sY == fruit.Location.sY))
 			{
@@ -72,37 +57,59 @@ void InitFruit(Fruit& fruit, bool bCheck)
 			break;
 		}
 	}
+	if (bContinueGame)
+	{
+		fruit.Location.sX = iContinueLocationFruitX;
+		fruit.Location.sY = iContinueLocationFruitY;
+	}
 }
 
 void InitSnake(Snake& snake)
 {
-	snake.LN[0].sX = 15;
-	snake.LN[0].sY = 15;
-	snake.iLength = 3;
-	snake.eDirecs = eDirections::RIGHT;
+	if (!bContinueGame)
+	{
+		snake.LN[0].sX = 15;
+		snake.LN[0].sY = 15;
+		snake.iLength = 3;
+		snake.eDirecs = eDirections::RIGHT;
+	}
+	else
+	{
+		snake.LN[0].sX = iContinueLocationSnakeX;
+		snake.LN[0].sY = iContinueLocationSnakeY;
+		snake.iLength = iContinueLengthSnake;
+		snake.eDirecs = (iContinueDirectionSnake == 1) ? eDirections::UP : ((iContinueDirectionSnake == 2) ? eDirections::DOWN : ((iContinueDirectionSnake == 3) ? eDirections::LEFT : eDirections::RIGHT));
+		for (int i = 1; i < iContinueLengthSnake; i++)
+		{
+			snake.LN[i].sX = iArrLocX[i - 1];
+			snake.LN[i].sY = iArrLocY[i - 1];
+		}
+		delete iArrLocX;
+		delete iArrLocY;
+	}
 }
 
 // Ve bang, thong tin, menu,...
-void TitleMenuMain() 
+void TitleMenuMain()
 {
 	LPSTR strTitle = (char*)"XIN CHAO - SNAKE DAY";
-	SetBackgroundColorTextXY2((WIDTH - 5) / 2 - 2, (HEIGHT - 5) / 2 - 2, Pink, 0, strTitle);
+	SetBackgroundColorTextXY2((WIDTH - 5) / 2 - 2, (HEIGHT - 5) / 2 - 2, PINK, 0, strTitle);
 	strTitle = (char*)"HAY DUA RA SU LUA CHON CUA BAN";
-	SetBackgroundColorTextXY2((WIDTH - 5) / 2 - 7, (HEIGHT - 5) / 2 - 1, Green, 0, strTitle);
+	SetBackgroundColorTextXY2((WIDTH - 5) / 2 - 7, (HEIGHT - 5) / 2 - 1, GREEN, 0, strTitle);
 }
 
 void InforDisplay(std::string strLevel, int& iScore)
 {
 	LPSTR StrTitle = (char*)"CAP DO: ";
-	SetBackgroundColorTextXY2(WIDTH + 4, 6, Green, 0, StrTitle);
-	SetColor(White);
+	SetBackgroundColorTextXY2(WIDTH + 4, 6, GREEN, 0, StrTitle);
+	SetColor(WHITE);
 	std::cout << strLevel;
 	StrTitle = (char*)"DIEM  : ";
-	SetBackgroundColorTextXY2(WIDTH + 4, 7, Green, 0, StrTitle);
-	SetColor(White);
+	SetBackgroundColorTextXY2(WIDTH + 4, 7, GREEN, 0, StrTitle);
+	SetColor(WHITE);
 	std::cout << iScore;
 	GotoXY(WIDTH / 2 - 7, HEIGHT + 3);
-	SetColor(White);
+	SetColor(WHITE);
 	std::cout << "Snake v1.0 by HuyDinhSE";
 }
 
@@ -118,27 +125,28 @@ bool InforDisGameOver(bool bCheck)
 	return false;
 }
 
-short XCoord(short SX) // Toa do x ve bang.
+short XCoord(short sX) // Toa do x ve bang.
 {
-	return ((SX * 2) + 6);
+	return ((sX * 2) + 6);
 }
 
-short YCoord(short SY) // Toa do y ve bang.
+short YCoord(short sY) // Toa do y ve bang.
 {
-	return (SY + 6);
+	return (sY + 6);
 }
 
 void PaintTable()
 {
 	for (int i = 5; i <= WIDTH; i++)
 	{
-		SetBackgroundColorTextXY2(i, 5, Yellow, 0, (char*)"%c", 4);
-		SetBackgroundColorTextXY2(i, HEIGHT + 1, Yellow, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(i, 5, YELLOW, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(i, HEIGHT + 1, YELLOW, 0, (char*)"%c", 4);
 	}
+
 	for (int i = 5; i <= HEIGHT; i++)
 	{
-		SetBackgroundColorTextXY2(5, i, Yellow, 0, (char*)"%c", 4);
-		SetBackgroundColorTextXY2(WIDTH, i, Yellow, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(5, i, YELLOW, 0, (char*)"%c", 4);
+		SetBackgroundColorTextXY2(WIDTH, i, YELLOW, 0, (char*)"%c", 4);
 	}
 
 	for (int i = 0; i < 25; ++i)
@@ -158,31 +166,32 @@ void PaintBoder()
 {
 	for (int i = 6; i < WIDTH; i++)
 	{
-		SetBackgroundColorTextXY2(i, 6, Yellow, 0, (char*)"%c", 3);
-		SetBackgroundColorTextXY2(i, 30, Yellow, 0, (char*)"%c", 3);
+		SetBackgroundColorTextXY2(i, 6, YELLOW, 0, (char*)"%c", 3);
+		SetBackgroundColorTextXY2(i, 30, YELLOW, 0, (char*)"%c", 3);
 	}
-	for (int i = 6; i <= 30; i++)
+
+	for (int i = 6; i <= HEIGHT; i++)
 	{
-		SetBackgroundColorTextXY2(6, i, Yellow, 0, (char*)"%c", 5);
-		SetBackgroundColorTextXY2(105, i, Yellow, 0, (char*)"%c", 5);
+		SetBackgroundColorTextXY2(6, i, YELLOW, 0, (char*)"%c", 5);
+		SetBackgroundColorTextXY2(105, i, YELLOW, 0, (char*)"%c", 5);
 	}
 }
 
 void PaintFruit(Fruit fruit)
 {
 	srand(time(NULL));
-	char iRandom = rand() % 6 + 1;
+	char cRandom = rand() % 6 + 1;
 	SetColor(13);
-	GotoXY(116,9);
+	GotoXY(116, 9);
 	std::cout << fruit.Location.sX;
 	GotoXY(116, 10);
 	std::cout << fruit.Location.sY;
-	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 0, (char*)"%c ", iRandom);
+	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 0, (char*)"%c ", cRandom);
 }
 
 void PaintSnake(Snake snake)
 {
-	SetBackgroundColorTextXY2(XCoord(snake.LN[0].sX), YCoord(snake.LN[0].sY),11,11, (char*)"  "); // Ve dau con ran
+	SetBackgroundColorTextXY2(XCoord(snake.LN[0].sX), YCoord(snake.LN[0].sY), 11, 11, (char*)"  "); // Ve dau con ran
 	for (int i = 1; i < snake.iLength; i++)
 	{
 		SetBackgroundColorTextXY2(XCoord(snake.LN[i].sX), YCoord(snake.LN[i].sY), 15, 15, (char*)"  "); // Ve than con ran
@@ -190,9 +199,9 @@ void PaintSnake(Snake snake)
 	SetBackgroundColorTextXY2(XCoord(snake.LN[snake.iLength - 1].sX), YCoord(snake.LN[snake.iLength - 1].sY), 8, 0, (char*)"  "); // Xoa duoi con ran
 }
 
-void PaintBox(short SX, short SY)
+void PaintBox(short sX, short sY)
 {
-	SetBackgroundColorTextXY2(XCoord(SX), YCoord(SY), 0, 0, (char*)"  ");
+	SetBackgroundColorTextXY2(XCoord(sX), YCoord(sY), 0, 0, (char*)"  ");
 }
 
 void PaintMenuControlConsole_UP()
@@ -217,7 +226,6 @@ void PaintMenuControlConsole_DOWN()
 	SetBackgroundColorTextXY2(115, 18, iDOWN, 0, (char*)"%c", 31);
 	SetBackgroundColorTextXY2(116, 18, iDOWN, 0, (char*)"%c", 31);
 	SetBackgroundColorTextXY2(117, 18, iDOWN, 0, (char*)"%c", 31);
-
 }
 
 void PaintMenuControlConsole_RIGHT()
@@ -238,67 +246,76 @@ void PaintMenuControlConsole()
 
 void PaintPine()
 {
-	SetBackgroundColorTextXY2(115, 6, Yellow, Black, (char*)"HUY");
-	SetBackgroundColorTextXY2(112, 12, Yellow, Black, (char*)"D I");
-	SetBackgroundColorTextXY2(116, 12, Green, Black, (char*)"*");
-	SetBackgroundColorTextXY2(118, 12, Yellow, Black, (char*)"N H");
-	SetColor(Green);
+	SetBackgroundColorTextXY2(115, 6, YELLOW,BLACK, (char*)"HUY");
+	SetBackgroundColorTextXY2(112, 12, YELLOW,BLACK, (char*)"D I");
+	SetBackgroundColorTextXY2(116, 12, GREEN,BLACK, (char*)"*");
+	SetBackgroundColorTextXY2(118, 12, YELLOW,BLACK, (char*)"N H");
+
+	SetColor(GREEN);
 	int n = 5;
-	for ( int i = 1; i <= n; i++) 
+	for ( int i = 1; i <= n; i++)
 	{
 		GotoXY(112, 6 + i);
-		for (int j = 1; j <= n - i; j++)
+		for (int j = 1; j <= (n - i); j++)
+		{
 			printf(" ");
+		}
 
 		for (int j = 1; j <= i; j++)
+		{
 			printf("* ");
-
+		}
 		printf("\n");
 	}
+
 	for (int i = 2; i <= n; i++)
 	{
-		GotoXY(112,11 + i);
-		for (int j = 1; j <= n - i; j++)
+		GotoXY(112, 11 + i);
+		for (int j = 1; j <= (n - i); j++)
+		{
 			printf(" ");
+		}
 
 		for (int j = 1; j <= i; j++)
+		{
 			printf("* ");
-
+		}
 		printf("\n");
 	}
 
-	SetBackgroundColorTextXY2(112, 17, Yellow, Black, (char*)"2 0");
-	SetBackgroundColorTextXY2(116, 17, Yellow, Green, (char*)" ");
-	SetBackgroundColorTextXY2(118, 17, Yellow, Black, (char*)"2 1");
-	SetBackgroundColorTextXY2(116, 18, Yellow, Green, (char*)"S");
-	SetBackgroundColorTextXY2(116, 19, Yellow, Green, (char*)"E");
-	SetBackgroundColorTextXY2(116, 20, Yellow, Green, (char*)" ");
+	SetBackgroundColorTextXY2(112, 17, YELLOW,BLACK, (char*)"2 0");
+	SetBackgroundColorTextXY2(116, 17, YELLOW, GREEN, (char*)" ");
+	SetBackgroundColorTextXY2(118, 17, YELLOW,BLACK, (char*)"2 1");
+	SetBackgroundColorTextXY2(116, 18, YELLOW, GREEN, (char*)"S");
+	SetBackgroundColorTextXY2(116, 19, YELLOW, GREEN, (char*)"E");
+	SetBackgroundColorTextXY2(116, 20, YELLOW, GREEN, (char*)" ");
 }
 
 void PaintMenuMain(short sIndex)
 { 
-	 TitleMenuMain();
-	 PaintBoder();
-	 PaintPine();
-	 sSelectLocation = sIndex;
-	 sTotalCatalog = 4;
+	TitleMenuMain();
+	PaintBoder();
+	PaintPine();
+	sSelectLocation = sIndex;
+	sTotalCatalog = 4;
 
 	//Ve Menu
-	 short SW = ((WIDTH - 5) / 2) + 2;
-	 short SH = ((HEIGHT - 5) / 2 + 3);
-	 if (bContinueGame)
-	 {
-		 LPSTR strTitles = (char*)"  TIEP TUC  ";
-		 SetBackgroundColorTextXY(SW, SH - 1, White, ((sIndex == 0) ? Red : 0), strTitles, strIcon, ((sIndex == 0) ? Pink : 0), 0);
-	 }
+	short sW = ((WIDTH - 5) / 2) + 2;
+	short sH = ((HEIGHT - 5) / 2 + 3);
+
 	LPSTR strTitle = (char*)"  CHOI NGAY  ";
-	SetBackgroundColorTextXY(SW, SH, White, ((sIndex == 1) ? Red : 0), strTitle, strIcon, ((sIndex == 1) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH, WHITE, ((sIndex == 1) ? RED : 0), strTitle, strIcon, ((sIndex == 1) ? PINK : 0), 0);
 	strTitle = (char*)"  CAP DO  ";
-	SetBackgroundColorTextXY(SW,SH + 1, White, ((sIndex == 2) ? Red : 0), strTitle, strIcon, ((sIndex == 2) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH + 1, WHITE, ((sIndex == 2) ? RED : 0), strTitle, strIcon, ((sIndex == 2) ? PINK : 0), 0);
 	strTitle = (char*)"  DIEM SO  ";
-	SetBackgroundColorTextXY(SW,SH + 2, White, ((sIndex == 3) ? Red : 0), strTitle, strIcon, ((sIndex == 3) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH + 2, WHITE, ((sIndex == 3) ? RED : 0), strTitle, strIcon, ((sIndex == 3) ? PINK : 0), 0);
 	strTitle = (char*)"  THOAT   ";
-	SetBackgroundColorTextXY(SW,SH + 3, White, ((sIndex == 4) ? Red : 0), strTitle, strIcon, ((sIndex == 4) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH + 3, WHITE, ((sIndex == 4) ? RED : 0), strTitle, strIcon, ((sIndex == 4) ? PINK : 0), 0);
+	if (bContinueGame)
+	{
+		strTitle = (char*)"  TIEP TUC  ";
+		SetBackgroundColorTextXY(sW, sH - 1, WHITE, ((sIndex == 0) ? RED : 0), strTitle, strIcon, ((sIndex == 0) ? PINK : 0), 0);
+	}
 
 	AUDIO(IDR_WAVE3);
 }
@@ -308,20 +325,20 @@ void PaintLevelMenu(short sIndex)
 	PaintBoder();
 	sSelectLocation = sIndex;
 	sTotalCatalog = 4;
-	SetColor(Green);
+	SetColor(GREEN);
 	LPSTR strTitleLevel = (char*)"  CHON CAP DO  ";
-	SetBackgroundColorTextXY2(((WIDTH - 5) / 2), ((HEIGHT - 5) / 2), Blue, 0, strTitleLevel);
+	SetBackgroundColorTextXY2(((WIDTH - 5) / 2), ((HEIGHT - 5) / 2), BLUE, 0, strTitleLevel);
 
-	short SW = ((WIDTH - 5) / 2) + 5;
-	short SH = ((HEIGHT - 5) / 2) + 2;
+	short sW = ((WIDTH - 5) / 2) + 5;
+	short sH = ((HEIGHT - 5) / 2) + 2;
 	LPSTR strTitle = (char*)"  DE  ";
-	SetBackgroundColorTextXY(SW, SH, White, ((sIndex == 0) ? Red : 0), strTitle, strIcon, ((sIndex == 0) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH, WHITE, ((sIndex == 0) ? RED : 0), strTitle, strIcon, ((sIndex == 0) ? PINK : 0), 0);
 	strTitle = (char*)"  TRUNG BINH  ";
-	SetBackgroundColorTextXY(SW - 4, SH + 1, White, ((sIndex == 1) ? Red : 0), strTitle, strIcon, ((sIndex == 1) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW - 4, sH + 1, WHITE, ((sIndex == 1) ? RED : 0), strTitle, strIcon, ((sIndex == 1) ? PINK : 0), 0);
 	strTitle = (char*)"  KHO ";
-	SetBackgroundColorTextXY(SW, SH + 2, White, ((sIndex == 2) ? Red : 0), strTitle, strIcon, ((sIndex == 2) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW, sH + 2, WHITE, ((sIndex == 2) ? RED : 0), strTitle, strIcon, ((sIndex == 2) ? PINK : 0), 0);
 	strTitle = (char*)"  THOAT  ";
-	SetBackgroundColorTextXY(SW - 1, SH + 3, White, ((sIndex == 3) ? Red : 0), strTitle, strIcon, ((sIndex == 3) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(sW - 1, sH + 3, WHITE, ((sIndex == 3) ? RED : 0), strTitle, strIcon, ((sIndex == 3) ? PINK : 0), 0);
 
 	AUDIO(IDR_WAVE3);
 }
@@ -332,30 +349,30 @@ void PaintMenuPause(short sIndex)
 	sTotalCatalog = 3;
 
 	LPSTR strTitle = (char*)"  TAM DUNG  ";
-	SetBackgroundColorTextXY2(WIDTH + 5, HEIGHT / 2 + 7, White, Green, strTitle);
+	SetBackgroundColorTextXY2(WIDTH + 5, HEIGHT / 2 + 7, WHITE, GREEN, strTitle);
 	strTitle = (char*)"  TIEP TUC  ";
-	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, White, ((sIndex == 0) ? Red : 0), strTitle, strIcon, ((sIndex == 0) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, WHITE, ((sIndex == 0) ? RED : 0), strTitle, strIcon, ((sIndex == 0) ? PINK : 0), 0);
 	strTitle = (char*)"LUU CHOI SAU ";
-	SetBackgroundColorTextXY(WIDTH + 4, HEIGHT / 2 + 10, White, ((sIndex == 1) ? Red : 0), strTitle, strIcon, ((sIndex == 1) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 4, HEIGHT / 2 + 10, WHITE, ((sIndex == 1) ? RED : 0), strTitle, strIcon, ((sIndex == 1) ? PINK : 0), 0);
 	strTitle = (char*)"  THOAT  ";
-	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, White, ((sIndex == 2) ? Red : 0), strTitle, strIcon, ((sIndex == 2) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, WHITE, ((sIndex == 2) ? RED : 0), strTitle, strIcon, ((sIndex == 2) ? PINK : 0), 0);
 
 	AUDIO(IDR_WAVE3);
 }
 
-void PaintMenuGameOver(int iIndex) 
+void PaintMenuGameOver(int iIndex)
 {
 	sSelectLocation = iIndex;
 	sTotalCatalog = 3;
 
 	LPSTR strTitle = (char*)"     THUA     ";
-	SetBackgroundColorTextXY2(WIDTH + 4, HEIGHT / 2 + 7, White, Green, strTitle);
+	SetBackgroundColorTextXY2(WIDTH + 4, HEIGHT / 2 + 7, WHITE, GREEN, strTitle);
 	strTitle = (char*)"  CHOI LAI  ";
-	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, White, ((iIndex == 0) ? Red : 0), strTitle, strIcon, ((iIndex == 0) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 5, HEIGHT / 2 + 9, WHITE, ((iIndex == 0) ? RED : 0), strTitle, strIcon, ((iIndex == 0) ? PINK : 0), 0);
 	strTitle = (char*)"  LUU  ";
-	SetBackgroundColorTextXY(WIDTH + 7, HEIGHT / 2 + 10, White, ((iIndex == 1) ? Red : 0), strTitle, strIcon, ((iIndex == 1) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 7, HEIGHT / 2 + 10, WHITE, ((iIndex == 1) ? RED : 0), strTitle, strIcon, ((iIndex == 1) ? PINK : 0), 0);
 	strTitle = (char*)"  THOAT  ";
-	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, White, ((iIndex == 2) ? Red : 0), strTitle, strIcon, ((iIndex == 2) ? Pink : 0), 0);
+	SetBackgroundColorTextXY(WIDTH + 6, HEIGHT / 2 + 11, WHITE, ((iIndex == 2) ? RED : 0), strTitle, strIcon, ((iIndex == 2) ? PINK : 0), 0);
 }
 
 //void TableCoordSave()
@@ -457,18 +474,22 @@ void Directional(Snake& snake)
 	if (snake.eDirecs == eDirections::UP)
 	{
 		snake.LN[0].sY--;
+		iContinueDirectionSnake = 1;
 	}
 	if (snake.eDirecs == eDirections::DOWN)
 	{
 		snake.LN[0].sY++;
+		iContinueDirectionSnake = 2;
 	}
 	if (snake.eDirecs == eDirections::LEFT)
 	{
 		snake.LN[0].sX--;
+		iContinueDirectionSnake = 3;
 	}
 	if (snake.eDirecs == eDirections::RIGHT)
 	{
 		snake.LN[0].sX++;
+		iContinueDirectionSnake = 4;
 	}
 }
 
@@ -556,13 +577,14 @@ void CheckSnake(Snake& snake, Fruit& fruit, int& iScore)
 		return;
 	}
 	Sleep(iTime);
+	AUDIO(102);
 }
 
 // Su kien khi ran an moi
 void UpdatePoint(int iScore)
 {
 	GotoXY(WIDTH + 12, 7);
-	SetColor(White);
+	SetColor(WHITE);
 	SetBackgroundColor(0);
 	std::cout << iScore;
 }
@@ -577,19 +599,23 @@ void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int&
 	InforDisplay(strLevel, iScore);
 	if (bContinueGame)
 	{
-		ContinueGameReadFile(snake, fruit);
+		ContinueGameReadFile();
+		InforDisplay(strContinueGameLevel, iScore);
 		UpdatePoint(iScore);
+		InitSnake(snake);
+		InitFruit(fruit, bCheckFruit);
 		PaintSnake(snake);
 		PaintFruit(fruit);
+		iTime = iContinueGameSpeed;
 	}
 	else
 	{
 		InitSnake(snake);
-		PaintSnake(snake);
 		InitFruit(fruit, bCheckFruit);
+		PaintSnake(snake);
 		PaintFruit(fruit);
 	}
-
+	bContinueGame = false;
 	AUDIO(IDR_WAVE5);
 	/*while (1)
 	{
@@ -624,7 +650,7 @@ bool BCheckGameOver(Snake& snake, Fruit& fruit)
 
 void EventProcessing()
 {
-	/*bContinueGame = (!BCheckFileEmpty()) ? true : false;
+	bContinueGame = (SizeOfFileContinue()) ? true : false;
 	if (bContinueGame)
 	{
 		PaintMenuMain(0);
@@ -633,63 +659,56 @@ void EventProcessing()
 	{
 		PaintMenuMain(1);
 	}
-	PaintMenuMain(1);
-	AUDIO(IDR_WAVE4);*/
+	AUDIO(IDR_WAVE4);
 	while (1)
 	{
-		do
+		if (bStatusGame)
 		{
-			if (bStatusGame)
+			Control(snake);
+			Directional(snake);
+			PaintMenuControlConsole();
+			CheckSnake(snake, fruit, iScore);
+			iUP = iDOWN = iLEFT = iRIGHT = YELLOW;
+		}
+		DWORD DWNumberOfEvents = 0; // Luu lai su kien hien tai.
+		DWORD DWNumberOfEventsRead = 0; // Luu lai so luong su kien da duoc loc.
+
+		HANDLE HConsoleInput = GetStdHandle(STD_INPUT_HANDLE); // Thiet bi dau vao.
+		GetNumberOfConsoleInputEvents(HConsoleInput, &DWNumberOfEvents); // Dat su kien dau vao cua giao dien cho bien DWNumberOfEvents.
+		if (DWNumberOfEvents)
+		{
+			INPUT_RECORD* IREventBuffer = new INPUT_RECORD[DWNumberOfEvents]; // Con tro EventBuffer.
+			ReadConsoleInput(HConsoleInput, IREventBuffer, DWNumberOfEvents, &DWNumberOfEventsRead); // Dat cac su kien duoc luu tru vao con EventBuffer.
+
+			// Chay vong lap de doc su kien.
+			for (DWORD i = 0; i < DWNumberOfEvents; ++i)
 			{
-				Control(snake);
-				Directional(snake);
-				PaintMenuControlConsole();
-				CheckSnake(snake, fruit, iScore);
-				iUP = iDOWN = iLEFT = iRIGHT = Yellow;
-			}
-			DWORD DWNumberOfEvents = 0; // Luu lai su kien hien tai.
-			DWORD DWNumberOfEventsRead = 0; // Luu lai so luong su kien da duoc loc.
-
-			HANDLE HConsoleInput = GetStdHandle(STD_INPUT_HANDLE); // Thiet bi dau vao.
-			GetNumberOfConsoleInputEvents(HConsoleInput, &DWNumberOfEvents); // Dat su kien dau vao cua giao dien cho bien DWNumberOfEvents.
-			if (DWNumberOfEvents)
-			{
-
-				INPUT_RECORD* IREventBuffer = new INPUT_RECORD[DWNumberOfEvents]; // Con tro EventBuffer.
-				ReadConsoleInput(HConsoleInput, IREventBuffer, DWNumberOfEvents, &DWNumberOfEventsRead); // Dat cac su kien duoc luu tru vao con EventBuffer.
-
-				// Chay vong lap de doc su kien.
-				/*omp_set_num_threads(2);
-				#pragma omp parallel for*/
-
-				for (DWORD i = 0; i < DWNumberOfEvents; ++i)
+				if (IREventBuffer[i].EventType == KEY_EVENT) // Neu la su kien phim.
 				{
-					if (IREventBuffer[i].EventType == KEY_EVENT) // Neu la su kien phim.
-					{
-						//UnregisterHotKey(NULL,VK_DOWN);
-						KeyboardProcessing(IREventBuffer[i].Event.KeyEvent);
-						//else if (IREventBuffer[i].EventType == MOUSE_EVENT)// Su kien chuot.
-						//{
-						//	std::cout << " X:" << IREventBuffer												[i].Event.MouseEvent.dwMousePosition.X
-						//		<< " Y:" << IREventBuffer[i].Event.MouseEvent.dwMousePosition.Y
-						//		<< std::endl;
-						//}
-					}
+					KeyboardProcessing(IREventBuffer[i].Event.KeyEvent);
+					//else if (IREventBuffer[i].EventType == MOUSE_EVENT)// Su kien chuot.
+					//{
+					//	std::cout << " X:" << IREventBuffer[i].Event.MouseEvent.dwMousePosition.X
+					//			  << " Y:" << IREventBuffer[i].Event.MouseEvent.dwMousePosition.Y
+					//		      << std::endl;
+					//}
 				}
 			}
-		} while (!bStatusGame);
+		}
 	}
 }
 
-void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iScore,bool bCheck)
+void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iScore, bool bCheck)
 {
-	if ((snake.LN[0].sX == fruit.Location.sX) && (snake.LN[0].sY == fruit.Location.sY)) {
+	if ((snake.LN[0].sX == fruit.Location.sX) && (snake.LN[0].sY == fruit.Location.sY))
+	{
 		snake.iLength++;
 		iScore++;
 		UpdatePoint(iScore);
 		InitFruit(fruit, bCheck);
 		PaintFruit(fruit);
 		iTime -= 2;
+		iContinueGameSpeed = iTime;
 		AUDIO(IDR_WAVE2);
 	}
 }
@@ -706,11 +725,11 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			case 1: // Menu Main
 				if (!bStatusGame)
 				{
-					if (sSelectLocation == 0 && bContinueGame)
+					if ((sSelectLocation == 0) && bContinueGame)
 					{
 						sSelectLocation = sTotalCatalog;
 					}
-					else if (sSelectLocation == 1 && !bContinueGame)
+					else if ((sSelectLocation == 1) && !bContinueGame)
 					{
 						sSelectLocation = sTotalCatalog;
 					}
@@ -741,7 +760,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			case 3: // Control Snake Up
 				if (bStatusGame)
 				{
-					iUP = Red;
+					iUP = RED;
 					if (snake.eDirecs == eDirections::DOWN) {} // khong cap nhat
 					else
 					{
@@ -749,8 +768,8 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					}
 					
 					/*if (snake.eDirecs == eDirections::DOWN); 
-					snake.eDirecs = eDirections::UP;*/ /*Error vi khi ran đi xuong (Down), 
-					bấm đi lên(UP) thì chạy vào IF đúng(true - đang trạng thái đi xuống), không được cập nhật biến snake.eDirecs đi lên (UP). Như vậy sai logic game, rắn quay đầu :)))  */
+					snake.eDirecs = eDirections::UP;*/ /*Error Vi khi ran di xuong (Down), 
+					bam di len(UP) thi chay vao IF dung(true - dang trang thai di xuong), khong duoc cap nhat bien snake.eDirecs di len (UP). Nhu vay sai logic game, tuc la ran bi quay dau*/
 
 					/*while (1)
 					{
@@ -761,7 +780,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					if (GetAsyncKeyState(VK_LEFT) || GetAsyncKeyState(VK_RIGHT))
 					{
 						break;
-					}*/				
+					}*/
 				}
 				break;
 			case 4: // Game Over
@@ -846,7 +865,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			case 3: // Control Snake DOWN
 				if (bStatusGame)
 				{
-					iDOWN = Red;
+					iDOWN = RED;
 					if (snake.eDirecs == eDirections::UP) {}// khong cap nhat
 					else
 					{
@@ -861,7 +880,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				}
 				break;
 			case 4: // Display Game Over
-				if (bStatusGame == false)
+				if (!bStatusGame)
 				{
 					if (sTotalCatalog == 3)
 					{
@@ -879,7 +898,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				}
 				break;
 			case 5: // Pause
-				if (bStatusGame == false)
+				if (!bStatusGame)
 				{
 					if (sTotalCatalog == 3)
 					{
@@ -900,7 +919,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 		case VK_LEFT:
 			if (bStatusGame)
 			{
-				iLEFT = Red;
+				iLEFT = RED;
 				if (snake.eDirecs == eDirections::RIGHT) {} // Khong cap nhat
 				else
 				{
@@ -916,13 +935,13 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				if (GetAsyncKeyState(VK_DOWN) || GetAsyncKeyState(VK_UP))
 				{
 					break;
-				}*/			
+				}*/
 			}
 			break;
 		case VK_RIGHT:
 			if (bStatusGame)
 			{
-				iRIGHT = Red;
+				iRIGHT = RED;
 				if (snake.eDirecs == eDirections::LEFT) {} // Khong cap nhat
 				else
 				{
@@ -950,7 +969,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				if (sSelectLocation == 0) // Tiep tuc
 				{
 					sPages = 3;
-					strLevel = iContinueGameLevel;
+					//strLevel = iContinueGameLevel;
 					DeleteRow(7, HEIGHT + 1);
 					RunEvent(snake, fruit, sSelectLocation, strLevel, iScore);
 					Sleep(1500);
@@ -966,7 +985,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				else if (sSelectLocation == 2) // Cap do
 				{
 					sPages = 2;
-					DeleteRow(11, 11);
+					DeleteRow(5, 20);
 					PaintLevelMenu(0);
 				}
 				else if (sSelectLocation == 3) // Diem so
@@ -1052,8 +1071,8 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					}
 					else if (sSelectLocation == 1) // Luu choi sau
 					{
-						bContinueGame = true;	
-						iContinueGameLevel = strLevel;
+						bContinueGame = true;
+						strContinueGameLevel = strLevel;
 						ContinueGameWriteFile();
 						DeleteRow(5, HEIGHT);
 						sPages = 1;
@@ -1072,7 +1091,6 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 			}
 			break;
 		case VK_ESCAPE: // ESC
-		{
 			switch (sPages)
 			{
 			case 1:
@@ -1095,155 +1113,198 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 				break;
 			}
 		}
-		}
 	}
 }
 
 // Luu ten
-void InputArrayScore(int iN)
+void InputArrayScorePlayer()
 {
-	PLAYER pTemp;
-	gets_s(pTemp.strName);
+	Player pTemp;
+	gets_s(pTemp.cName);
 	pTemp.iScore = iScore;
-	Player.push_back(pTemp);
+	player.push_back(pTemp);
 }
 
-void Swap(PLAYER* PL1, PLAYER* PL2)
+void Swap(Player* pl1, Player* pl2)
 {
-	PLAYER PTemp = *PL1;
-	*PL1 = *PL2;
-	*PL2 = PTemp;
+	Player pTemp = *pl1;
+	*pl1 = *pl2;
+	*pl2 = pTemp;
 }
 
 void SaveName(int iScore)
 {
 	LPSTR strTitle = (char*)"   TEN (KHONG DAU)   ";
-	SetBackgroundColorTextXY2(WIDTH / 2 - 8, HEIGHT / 2 + 2, Black, Red, strTitle);
+	SetBackgroundColorTextXY2(WIDTH / 2 - 8, HEIGHT / 2 + 2, BLACK, RED, strTitle);
 	strTitle = (char*)"               ";
-	SetBackgroundColorTextXY2(WIDTH / 2 - 5, HEIGHT / 2 + 3, Black, White, strTitle);
-	SetColor(Black);
+	SetBackgroundColorTextXY2(WIDTH / 2 - 5, HEIGHT / 2 + 3, BLACK, WHITE, strTitle);
+	ReadFileForSort();
+	SetColor(BLACK);
 	GotoXY(WIDTH / 2 + 1, HEIGHT / 2 + 3);
-	InputArrayScore(MAXPLAYER - 1);
+	InputArrayScorePlayer();
 
 	// Sap Xep
-	int iLength = Player.size();
-	for (int i = 0; i < iLength - 1; i++) {
-		for (int j = i + 1; j < iLength; j++) {
-			if (Player[i].iScore < Player[j].iScore)
+	int iCountPlayer = player.size();
+	if (iCountPlayer > 1)
+	{
+		for (int i = 0; i < iCountPlayer; i++)
+		{
+			for (int j = i + 1; j < iCountPlayer; j++)
 			{
-				Swap(&Player[i], &Player[j]);
+				if (player[i].iScore < player[j].iScore)
+				{
+					Swap(&player[i], &player[j]);
+				}
 			}
 		}
 	}
 
-	WriteFileUpdate(iLength);
+	WriteFileUpdate(iCountPlayer);
+	player.clear();
+}
+
+void ReadFileForSort()
+{
+	std::ifstream fileIn;
+	fileIn.open("rank.txt", std::ios_base::in);
+	int iCount = 0;
+	int iLine = SizeOfFileRank();
+	Player pTemp;
+	while (!fileIn.eof())
+	{		
+		if ((iCount > iLine) || !iLine)
+		{
+			break;
+		}
+		fileIn >> pTemp.cName;
+		fileIn >> pTemp.iScore;
+		player.push_back(pTemp);
+		iCount++;
+	}
+	fileIn.close();
 }
 
 void WriteFileUpdate(int iLength)
 {
-	FILE* _FileOut;
-	errno_t _ErrOut = fopen_s(&_FileOut, "rank.txt", "w+");
+	std::ofstream fileOut;
+	fileOut.open("rank.txt", std::ios_base::out);
 	for (int i = 0; i < iLength; i++)
 	{
-		fprintf_s(_FileOut, "%s\t%d\n", Player[i].strName, Player[i].iScore);
+		fileOut << player[i].cName << "\t";
+		fileOut << player[i].iScore << "\n";
 	}
-	fclose(_FileOut);
+	fileOut.close();
 }
 
-bool BCheckFileEmpty()
+int SizeOfFileContinue()
 {
-	FILE* _FileIn;
-	errno_t _ErrOut = fopen_s(&_FileIn, "continuegame.txt", "r");
-	int iSizeFile = SizeOfFile(_FileIn);
-	fclose(_FileIn);
-	if (!iSizeFile)
+	std::ifstream fileIn;
+	fileIn.open("continuegame.txt", std::ios_base::in);
+	int iLine = 0;
+	std::string strLine;
+	if(getline(fileIn, strLine))
 	{
-		return true;
+		++iLine;
 	}
-	return false;
+	fileIn.close();
+	return iLine;
 }
 
-int SizeOfFile(FILE* _File)
+int SizeOfFileRank()
 {
-	fseek(_File, 0, SEEK_END); 
-	int _SizeFile = ftell(_File);
-	fseek(_File, 0, SEEK_SET); 
-	return _SizeFile;
+	std::ifstream fileIn;
+	fileIn.open("rank.txt", std::ios_base::in);
+	int iLine = 0;
+	std::string strLine;
+	while (std::getline(fileIn,strLine))
+	{
+		iLine++;
+	}
+	fileIn.close();
+	return (iLine - 1);
 }
 
 void TopScore()
 {
 	LPSTR strTitle1 = (char*)"     TOP     ";
-	SetBackgroundColorTextXY2(WIDTH / 2 + 1,6, Yellow,Red, strTitle1);
+	SetBackgroundColorTextXY2(WIDTH / 2 + 1, 6, YELLOW, RED, strTitle1);
 	LPSTR strTitle2 = (char*)"                    ";
 	for (int i = 7; i <= 22; i++)
 	{
 		for (int j = WIDTH / 2 - 7; j < WIDTH / 2 + 3; j++)
 		{
-			SetBackgroundColorTextXY2(j,i, Black, White, strTitle2);
+			SetBackgroundColorTextXY2(j , i, BLACK, WHITE, strTitle2);
 		}
 	}
-	SetColor(Black);
+	SetColor(BLACK);
 	ReadFile();
 	while (_getch() != 13) {};
 }
 
 void ReadFile()
-{
-	FILE* _FileIn;
-	errno_t _ErrOut = fopen_s(&_FileIn, "rank.txt", "r");
-	/*if (_ErrOut)
+{	
+	std::ifstream fileIn;
+	fileIn.open("rank.txt", std::ios_base::in);
+	char cTopPlayer[20];
+	int iCount = 1;
+	while (!fileIn.eof() && (iCount < 10))
 	{
-		cout << "Mo file out khong thanh cong!" << endl;
-	}*/
-	char _cTemp[20];
-	int i = 0;
-	while(fscanf_s(_FileIn,"%[^\n]", _cTemp, __crt_countof(_cTemp)) != EOF)
-	{
-		GotoXY(WIDTH / 2 + 2, (HEIGHT / 2 - 6) + i);
-		printf_s("%s", _cTemp);
-		i++;
-		fseek(_FileIn,2, SEEK_CUR);
-		if (i > 10)
-		{
-			break;
-		}
+		GotoXY(WIDTH / 2 + 2, (HEIGHT / 2 - 6) + iCount);
+		fileIn.getline(cTopPlayer, '\n');
+		iCount++;
+		std::cout << cTopPlayer;
 	}
-	fclose(_FileIn);
+	fileIn.close();
 }
 
 void ContinueGameWriteFile()
 {
-	FILE* _FileOut;
-	errno_t _ErrOut = fopen_s(&_FileOut, "continuegame.txt", "w+");
+	std::ofstream fileOut;
+	fileOut.open("continuegame.txt", std::ios_base::out);
 	iContinueLengthSnake = snake.iLength;
-	iContinueLocationSnake_iX = snake.LN->sX;
-	iContinueLocationSnake_iY = snake.LN->sY;
-	iContinueLocationFruit_iX = fruit.Location.sX;
-	iContinueLocationFruit_iY = fruit.Location.sY;
+	iContinueLocationSnakeX = snake.LN->sX;
+	iContinueLocationSnakeY = snake.LN->sY;
+	iContinueLocationFruitX = fruit.Location.sX;
+	iContinueLocationFruitY = fruit.Location.sY;
 	iContinueGameScore = iScore;
-	fprintf_s(_FileOut, "%d\n%d\n%d\n%d\n%d\n%d\n", 
-		iContinueLengthSnake, 
-		iContinueLocationSnake_iX,
-		iContinueLocationSnake_iY,
-		iContinueLocationFruit_iX,
-		iContinueLocationFruit_iY,
-		iContinueGameScore);
-	fclose(_FileOut);
+
+	fileOut << iContinueLengthSnake << "\n";
+	fileOut << iContinueLocationSnakeX << "\n";
+	fileOut << iContinueLocationSnakeY << "\n";
+	for (int i = 1; i < snake.iLength; i++)
+	{
+		fileOut << snake.LN[i].sX << "\n";
+		fileOut << snake.LN[i].sY << "\n";
+	}
+	fileOut << iContinueLocationFruitX << "\n";
+	fileOut << iContinueLocationFruitY << "\n";
+	fileOut << iContinueGameScore << "\n";
+	fileOut << iContinueDirectionSnake << "\n";
+	fileOut << iContinueGameSpeed << "\n";
+	fileOut << strContinueGameLevel;
+	fileOut.close();
 }
 
-void ContinueGameReadFile(Snake snake, Fruit fruit)
+void ContinueGameReadFile()
 {
-	FILE* _FileIn;
-	errno_t _ErrOut = fopen_s(&_FileIn, "continuegame.txt", "r");
-	fscanf_s(_FileIn, "%d\n%d\n%d\n%d\n%d\n%d\n",
-		&snake.iLength,
-		&snake.LN->sX,
-		&snake.LN->sY,
-		&fruit.Location.sX,
-		&fruit.Location.sY,
-		&iScore);
-	fclose(_FileIn);
+	std::ifstream fileIn;
+	fileIn.open("continuegame.txt", std::ios_base::in);
+	fileIn >> iContinueLengthSnake;
+	fileIn >> iContinueLocationSnakeX;
+	fileIn >> iContinueLocationSnakeY;
+	iArrLocX = new int[iContinueLengthSnake];
+	iArrLocY = new int[iContinueLengthSnake];
+	for (int i = 0; i < iContinueLengthSnake - 1; i++)
+	{
+		fileIn >> iArrLocX[i];
+		fileIn >> iArrLocY[i];
+	}
+	fileIn >> iContinueLocationFruitX;
+	fileIn >> iContinueLocationFruitY;
+	fileIn >> iScore;
+	fileIn >> iContinueDirectionSnake;
+	fileIn >> iContinueGameSpeed;
+	fileIn >> strContinueGameLevel;
+	fileIn.close();
+	remove("continuegame.txt");
 }
-
-

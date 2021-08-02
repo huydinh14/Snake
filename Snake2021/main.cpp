@@ -2,18 +2,17 @@
 #include "function.hpp"
 #include "console.hpp"
 
-//Trang,Vị Trí, Tổng mục
+//Trang, Vi Tri, Tong muc
 short sPages, sSelectLocation, sTotalCatalog;
 
-int main(){
+int main()
+{
 	try
 	{
 		ConsoleResize(123, 40);
 		DeleteMenu(GetSystemMenu(GetConsoleWindow(), FALSE), SC_MAXIMIZE, MF_BYCOMMAND);
 		SetConsoleTitle(TEXT("Snake Game - Huy Dinh SE"));
 		ShowCur(false);
-		PaintMenuMain(1);
-		AUDIO(IDR_WAVE4);
 		sPages = 1;
 		EventProcessing();
 	}

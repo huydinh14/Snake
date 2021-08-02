@@ -2,12 +2,11 @@
 #include "main.hpp"
 
 // Init
-void InitSnake(Snake& snake);								 
+void InitSnake(Snake& snake);
 void InitFruit(Fruit& fruit, bool bCheck);
 
-// 
-short XCoord(short SX);
-short YCoord(short SY);
+short XCoord(short sX);
+short YCoord(short sY);
 
 // Paint
 void TitleMenuMain();
@@ -17,21 +16,21 @@ void PaintMenuControlConsole();
 void PaintBoder();
 void PaintPine();
 void PaintTable();
-void PaintBox(short SX, short SY);
-void PaintSnake(Snake snake);	
+void PaintBox(short sX, short sY);
+void PaintSnake(Snake snake);
 void PaintFruit(Fruit fruit);
 void PaintMenuMain(short sIndex);
 void PaintLevelMenu(short sIndex);
 void PaintMenuPause(short sIndex);
 void PaintMenuGameOver(int iIndex);
 
-// Control		                  
+// Control
 void Control(Snake& snake);
 void Directional(Snake& snake);
 
 // Even processing
 void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int& iScore);
-void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iScore,bool bCheck);
+void SnakeEatFruit(Snake& snake, Fruit& fruit, int& iScore, bool bCheck);
 void UpdatePoint(int iScore);
 bool BCheckGameOver(Snake& snake, Fruit& fruit);
 void EventProcessing();
@@ -43,11 +42,9 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey);
 void SaveName(int iScore);
 void TopScore();
 void ReadFile();
-bool BCheckFileEmpty();
+void ReadFileForSort();
 void WriteFileUpdate(int iLength);
-int SizeOfFile(FILE* _File);
 void ContinueGameWriteFile();
-void ContinueGameReadFile(Snake snake, Fruit fruit);
-
-
-
+void ContinueGameReadFile();
+int SizeOfFileRank();
+int SizeOfFileContinue();

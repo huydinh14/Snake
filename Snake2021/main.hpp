@@ -4,29 +4,33 @@
 #include <conio.h>
 #include <time.h>
 #include <string.h>
-#include "resource.hpp"
 #include <windows.h>
 #include <stdio.h>
 #include <vector>
+#include <fstream>
 
+#include "resource.hpp"
 
 #pragma comment(lib, "winmm.lib")
 #define AUDIO(FileName) (PlaySound(MAKEINTRESOURCE(FileName),GetModuleHandle(NULL),SND_RESOURCE | SND_ASYNC));
 
 extern short sPages, sSelectLocation, sTotalCatalog;
 
-enum class eDirections {
+enum class eDirections
+{
 	UP,
 	DOWN,
 	LEFT,
 	RIGHT
 };
+
 enum class eLevel
 {
 	EASY = 25, NORMAL = 30, HARD = 35
-}; 
+};
 
-struct Location {
+struct Location
+{
 	short sX;
 	short sY;
 };
@@ -43,8 +47,8 @@ struct Fruit
 	Location Location;
 };
 
-struct PLAYER
+struct Player
 {
-	char strName[10];
+	char cName[10];
 	int iScore;
 };

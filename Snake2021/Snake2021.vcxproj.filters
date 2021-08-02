@@ -38,6 +38,9 @@
     <ClInclude Include="resource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="define.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="snake.rc">

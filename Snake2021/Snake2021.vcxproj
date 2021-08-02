@@ -145,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console.hpp" />
+    <ClInclude Include="define.hpp" />
     <ClInclude Include="function.hpp" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="resource.hpp" />
