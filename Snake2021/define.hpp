@@ -11,6 +11,6 @@
 #define WHITE			15
 
 #define WIDTH			106
-#define HEIGHT			30
+#define HEIGHT			26
 #define WALL			45
 #define MAXPLAYER		50

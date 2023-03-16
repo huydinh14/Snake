@@ -42,8 +42,8 @@ void InitFruit(Fruit& fruit, bool bCheck)
 	srand(time(NULL));
 	while (!bCheck)
 	{
-		fruit.Location.sX = rand() % 50;
-		fruit.Location.sY = rand() % 25;
+		fruit.Location.sX = 3 + rand() % 50;
+		fruit.Location.sY = 3 + rand() % 23;
 		for (int i = 0; i < snake.iLength - 1; i++)
 		{
 			if ((snake.LN[i].sX == fruit.Location.sX) && (snake.LN[i].sY == fruit.Location.sY))
@@ -127,52 +127,66 @@ bool InforDisGameOver(bool bCheck)
 
 short XCoord(short sX) // Toa do x ve bang.
 {
-	return ((sX * 2) + 6);
+	//return ((sX * 2) + 6);
+	return sX * 2;
 }
 
 short YCoord(short sY) // Toa do y ve bang.
 {
-	return (sY + 6);
+	/*return (sY + 6);*/
+	return (sY);
 }
 
-void PaintTable()
+short XCoordFruit(short sX) // Toa do x ve bang.
 {
-	for (int i = 5; i <= WIDTH; i++)
-	{
-		SetBackgroundColorTextXY2(i, 5, YELLOW, 0, (char*)"%c", 4);
-		SetBackgroundColorTextXY2(i, HEIGHT + 1, YELLOW, 0, (char*)"%c", 4);
-	}
-
-	for (int i = 5; i <= HEIGHT; i++)
-	{
-		SetBackgroundColorTextXY2(5, i, YELLOW, 0, (char*)"%c", 4);
-		SetBackgroundColorTextXY2(WIDTH, i, YELLOW, 0, (char*)"%c", 4);
-	}
-
-	for (int i = 0; i < 25; ++i)
-	{
-		for (int j = 0; j < 50; ++j)
-		{
-			/*if (((i % 2) && (j % 2)) || !((i % 2) || (j % 2)))
-			{
-				PaintBox(j, i);
-			}*/
-			PaintBox(j, i);
-		}
-	}
+	//return ((sX * 2) + 6);
+	return sX;
 }
+
+short YCoordFruit(short sY) // Toa do y ve bang.
+{
+	/*return (sY + 6);*/
+	return sY;
+}
+
+//void PaintTable()
+//{
+//	for (int i = 3; i <= WIDTH; i++)
+//	{
+//		SetBackgroundColorTextXY2(i, 3, YELLOW, 0, (char*)"%c", 4);
+//		SetBackgroundColorTextXY2(i, HEIGHT, YELLOW, 0, (char*)"%c", 4);
+//	}
+//
+//	for (int i = 3; i <= HEIGHT; i++)
+//	{
+//		SetBackgroundColorTextXY2(3, i, YELLOW, 0, (char*)"%c", 4);
+//		SetBackgroundColorTextXY2(WIDTH, i, YELLOW, 0, (char*)"%c", 4);
+//	}
+//
+//	for (int i = 0; i < 25; ++i)
+//	{
+//		for (int j = 0; j < 50; ++j)
+//		{
+//			/*if (((i % 2) && (j % 2)) || !((i % 2) || (j % 2)))
+//			{
+//				PaintBox(j, i);
+//			}*/
+//			PaintBox(j, i);
+//		}
+//	}
+//}
 
 void PaintBoder()
 {
-	for (int i = 6; i < WIDTH; i++)
+	for (int i = 2; i < WIDTH; i++)
 	{
-		SetBackgroundColorTextXY2(i, 6, YELLOW, 0, (char*)"%c", 3);
-		SetBackgroundColorTextXY2(i, 30, YELLOW, 0, (char*)"%c", 3);
+		SetBackgroundColorTextXY2(i, 2, YELLOW, 0, (char*)"%c", 3);
+		SetBackgroundColorTextXY2(i, HEIGHT, YELLOW, 0, (char*)"%c", 3);
 	}
 
-	for (int i = 6; i <= HEIGHT; i++)
+	for (int i = 3; i <= HEIGHT; i++)
 	{
-		SetBackgroundColorTextXY2(6, i, YELLOW, 0, (char*)"%c", 5);
+		SetBackgroundColorTextXY2(2, i, YELLOW, 0, (char*)"%c", 5);
 		SetBackgroundColorTextXY2(105, i, YELLOW, 0, (char*)"%c", 5);
 	}
 }
@@ -186,7 +200,7 @@ void PaintFruit(Fruit fruit)
 	std::cout << fruit.Location.sX;
 	GotoXY(116, 10);
 	std::cout << fruit.Location.sY;
-	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 0, (char*)"%c ", cRandom);
+	SetBackgroundColorTextXY2(XCoord(fruit.Location.sX), YCoord(fruit.Location.sY), 14, 0, (char*)"%c", cRandom);
 }
 
 void PaintSnake(Snake snake)
@@ -201,7 +215,7 @@ void PaintSnake(Snake snake)
 
 void PaintBox(short sX, short sY)
 {
-	SetBackgroundColorTextXY2(XCoord(sX), YCoord(sY), 0, 0, (char*)"  ");
+	SetBackgroundColorTextXY2(XCoord(sX), YCoord(sY), 0, RED, (char*)"  ");
 }
 
 void PaintMenuControlConsole_UP()
@@ -244,58 +258,58 @@ void PaintMenuControlConsole()
 	PaintMenuControlConsole_RIGHT();
 }
 
-void PaintPine()
-{
-	SetBackgroundColorTextXY2(115, 6, YELLOW,BLACK, (char*)"HUY");
-	SetBackgroundColorTextXY2(112, 12, YELLOW,BLACK, (char*)"D I");
-	SetBackgroundColorTextXY2(116, 12, GREEN,BLACK, (char*)"*");
-	SetBackgroundColorTextXY2(118, 12, YELLOW,BLACK, (char*)"N H");
-
-	SetColor(GREEN);
-	int n = 5;
-	for ( int i = 1; i <= n; i++)
-	{
-		GotoXY(112, 6 + i);
-		for (int j = 1; j <= (n - i); j++)
-		{
-			printf(" ");
-		}
-
-		for (int j = 1; j <= i; j++)
-		{
-			printf("* ");
-		}
-		printf("\n");
-	}
-
-	for (int i = 2; i <= n; i++)
-	{
-		GotoXY(112, 11 + i);
-		for (int j = 1; j <= (n - i); j++)
-		{
-			printf(" ");
-		}
-
-		for (int j = 1; j <= i; j++)
-		{
-			printf("* ");
-		}
-		printf("\n");
-	}
-
-	SetBackgroundColorTextXY2(112, 17, YELLOW,BLACK, (char*)"2 0");
-	SetBackgroundColorTextXY2(116, 17, YELLOW, GREEN, (char*)" ");
-	SetBackgroundColorTextXY2(118, 17, YELLOW,BLACK, (char*)"2 1");
-	SetBackgroundColorTextXY2(116, 18, YELLOW, GREEN, (char*)"S");
-	SetBackgroundColorTextXY2(116, 19, YELLOW, GREEN, (char*)"E");
-	SetBackgroundColorTextXY2(116, 20, YELLOW, GREEN, (char*)" ");
-}
+//void PaintPine()
+//{
+//	SetBackgroundColorTextXY2(115, 6, YELLOW,BLACK, (char*)"HUY");
+//	SetBackgroundColorTextXY2(112, 12, YELLOW,BLACK, (char*)"D I");
+//	SetBackgroundColorTextXY2(116, 12, GREEN,BLACK, (char*)"*");
+//	SetBackgroundColorTextXY2(118, 12, YELLOW,BLACK, (char*)"N H");
+//
+//	SetColor(GREEN);
+//	int n = 5;
+//	for ( int i = 1; i <= n; i++)
+//	{
+//		GotoXY(112, 6 + i);
+//		for (int j = 1; j <= (n - i); j++)
+//		{
+//			printf(" ");
+//		}
+//
+//		for (int j = 1; j <= i; j++)
+//		{
+//			printf("* ");
+//		}
+//		printf("\n");
+//	}
+//
+//	for (int i = 2; i <= n; i++)
+//	{
+//		GotoXY(112, 11 + i);
+//		for (int j = 1; j <= (n - i); j++)
+//		{
+//			printf(" ");
+//		}
+//
+//		for (int j = 1; j <= i; j++)
+//		{
+//			printf("* ");
+//		}
+//		printf("\n");
+//	}
+//
+//	SetBackgroundColorTextXY2(112, 17, YELLOW,BLACK, (char*)"2 0");
+//	SetBackgroundColorTextXY2(116, 17, YELLOW, GREEN, (char*)" ");
+//	SetBackgroundColorTextXY2(118, 17, YELLOW,BLACK, (char*)"2 1");
+//	SetBackgroundColorTextXY2(116, 18, YELLOW, GREEN, (char*)"S");
+//	SetBackgroundColorTextXY2(116, 19, YELLOW, GREEN, (char*)"E");
+//	SetBackgroundColorTextXY2(116, 20, YELLOW, GREEN, (char*)" ");
+//}
 
 void PaintMenuMain(short sIndex)
 { 
 	TitleMenuMain();
 	PaintBoder();
-	PaintPine();
+	//PaintPine();
 	sSelectLocation = sIndex;
 	sTotalCatalog = 4;
 
@@ -595,7 +609,8 @@ void RunEvent(Snake& snake, Fruit& fruit, int iIndex, std::string strLevel, int&
 	iScore = 0;
 	bool bCheckFruit = false;
 	bStatusGame = true;
-	PaintTable();
+	//PaintTable();
+	PaintBoder();
 	InforDisplay(strLevel, iScore);
 	if (bContinueGame)
 	{
@@ -979,13 +994,13 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 					bContinueGame = false;
 					iTime = 120;
 					sPages = 3;
-					DeleteRow(7, HEIGHT + 1);
+					DeleteRow(2, HEIGHT - 1);
 					RunEvent(snake, fruit, sSelectLocation, strLevel = "DE", iScore);
 				}
 				else if (sSelectLocation == 2) // Cap do
 				{
 					sPages = 2;
-					DeleteRow(5, 20);
+					DeleteRow(2, HEIGHT);
 					PaintLevelMenu(0);
 				}
 				else if (sSelectLocation == 3) // Diem so
@@ -1064,7 +1079,8 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 						sPages = 3;
 						bStatusGame = true;
 						DeleteRow(15, 20);
-						PaintTable();
+						//PaintTable();
+						PaintBoder();
 						PaintSnake(snake);
 						PaintFruit(fruit);
 						Sleep(1500);
@@ -1083,7 +1099,7 @@ void KeyboardProcessing(KEY_EVENT_RECORD kKey)
 						sPages = 1;
 						bStatusGame = false;
 						bContinueGame = false;
-						DeleteRow(5, HEIGHT);
+						DeleteRow(2, HEIGHT);
 						PaintMenuMain(1);
 					}
 				}

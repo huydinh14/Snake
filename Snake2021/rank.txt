@@ -1,7 +1,8 @@
 Kim	30
 HUY	29
 Huy	26
-Ha	8
+top1	20
 Tuan	8
+Ha	8
 Tuan	6
 Vinh	4

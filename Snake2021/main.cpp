@@ -9,7 +9,7 @@ int main()
 {
 	try
 	{
-		ConsoleResize(123, 40);
+		ConsoleResize(127, 30);
 		DeleteMenu(GetSystemMenu(GetConsoleWindow(), FALSE), SC_MAXIMIZE, MF_BYCOMMAND);
 		SetConsoleTitle(TEXT("Snake Game - Huy Dinh SE"));
 		ShowCur(false);
