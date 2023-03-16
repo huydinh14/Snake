@@ -1,23 +1,24 @@
-﻿#include "main.h"
-#include "Function.hpp"
-#include "Console.hpp"
+﻿#include "main.hpp"
+#include "function.hpp"
+#include "console.hpp"
 
-//Trang,Vị Trí, Tổng mục
+//Trang, Vi Tri, Tong muc
 short sPages, sSelectLocation, sTotalCatalog;
 
-int main(){
+int main()
+{
 	try
 	{
-		ConsoleResize(123,35);
+		ConsoleResize(127, 30);
+		DeleteMenu(GetSystemMenu(GetConsoleWindow(), FALSE), SC_MAXIMIZE, MF_BYCOMMAND);
 		SetConsoleTitle(TEXT("Snake Game - Huy Dinh SE"));
 		ShowCur(false);
-		PaintMenuMain(1);
 		sPages = 1;
 		EventProcessing();
 	}
 	catch (const std::exception&)
 	{
-
+		std::cout << "Error.\n";
 	}
 	return 0;
 }

@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Function.cpp">
+    <ClCompile Include="function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp">
+    <ClCompile Include="console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -26,17 +26,47 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Function.hpp">
+    <ClInclude Include="function.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Console.hpp">
+    <ClInclude Include="console.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="main.h">
+    <ClInclude Include="main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="define.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="snake.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="game_over.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="eat_fruit.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="operation_menu.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="intro.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="playgame.wav">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\icon1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
